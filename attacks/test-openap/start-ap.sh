@@ -44,9 +44,9 @@ sudo dnsmasq -C "$CONF_DIR/dnsmasq.conf"
 # NAT configuration
 if [[ "$1" == "nat" ]]; then
   echo "{+] Applying NAT and forwarding rules ... " 
-  sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o enp0s25 -j MASQUERADE
-  sudo iptables -A FORWARD -i $IFACE -o enp0s25 -j ACCEPT
-  sudo iptables -A FORWARD -i enp0s25 -o $IFACE -m state --state RELATED,ESTABLISHED -j ACCEPT
+  sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o ens33 -j MASQUERADE
+  sudo iptables -A FORWARD -i $IFACE -o ens33 -j ACCEPT
+  sudo iptables -A FORWARD -i ens33 -o $IFACE -m state --state RELATED,ESTABLISHED -j ACCEPT
 else
   echo "{+] Skipping NAT setup (internet blocked for clients) ... "
 fi
