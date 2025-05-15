@@ -66,4 +66,9 @@ Use the provided scripts to start and stop rogue APs in either NAT (internet pas
 ---
 
 ## License
-- MIT License or project-specific license
+This project is licenced under the MIT Licence.
+
+## Author
+- Paul Smurthwaite
+- 15 May 2025
+- TM470-25B
