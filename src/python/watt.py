@@ -48,8 +48,8 @@ def get_interface_mode():
 
 def pause_on_invalid():
     """Display invalid input message and pause."""
-    print("\n[!] Invalid option. Please try again.")
-    input("[Press Enter to continue]")
+    print("\33[91m\n  [!] Invalid option. Please try again.\033[0m")
+    input("  [Press Enter to continue]")
 
 def clear_screen():
     """Clear terminal screen."""
@@ -57,7 +57,7 @@ def clear_screen():
 
 def print_header(title="Wireless Attack Testing Toolkit"):
     """Print section header."""
-    print(f"\033[1;94m[ {title} ]\033[0m")
+    print(f"\033[1;91m[ {title} ]\033[0m")
 
 def print_divider():
     print("\033[90m-----------------------------------\033[0m")
@@ -124,7 +124,7 @@ def show_menu():
     
     # Generate ASCII banner
     ascii_banner = pyfiglet.figlet_format("WATT", font="ansi_shadow")
-    print("\033[94m" + ascii_banner + "\033[0m")
+    print("\033[91m" + ascii_banner + "\033[0m")
     print_header()
     print()
     print_divider()
@@ -138,9 +138,9 @@ def show_menu():
     # Generate menu
     print_divider()
     print_header("Automated Testing")
-    print("  [1] Launch Threat Scenario\n")
+    print("  [1] Threat Scenarios\n")
 
-    print_header("Manual Control")
+    print_header("Standalone Tools")
     print("  [2] Access Points")
     print("  [3] Attack Tools\n")
 
@@ -244,7 +244,7 @@ def threat_scenario():
 
         print_subtitle()
 
-        print_header("Launch Threat Scenario")
+        print_header("Threat Scenarios")
         print()
 
         print_header("Access Point Threats")
@@ -310,11 +310,11 @@ def ap_profiles():
         print_header("Standalone Access Point Profiles")
         print()
 
-        print("  [1] OPN (Unencrypted)")
-        print("  [2] WPA2-PSK Personal")
-        print("  [3] Hidden SSID (WPA2-PSK)")
-        print("  [4] Spoofed SSID (OPN)")
-        print("  [5] Misconfigured (WPA1-TKIP)")
+        print("  [1] Launch OPN Access Point (Unencrypted)")
+        print("  [2] Launch WPA2 Personal Personal Access Point (WPA2-PSK)")
+        print("  [3] Launch Hidden SSID Access Point (WPA2-PSK)")
+        print("  [4] Launch Spoofed SSID Access Point (OPN)")
+        print("  [5] Launch Misconfigured Access Point (WPA1-TKIP)")
 
         print("\n  [0] Return to Main Menu")
 
@@ -334,26 +334,26 @@ def attack_tools():
     """Attack Tools submenu."""
 
     def run_deauth():
-        run_bash_script("attack-deauth/attack.sh", pause=True, capture=False, title="Deauthentication Flood")
+        run_bash_script("attack-deauth/attack.sh", pause=True, capture=False, title="T007 - Deauthentication Flood")
 
     def run_beacon():
-        run_bash_script("attack-beacon/attack.sh", pause=True, capture=False, title="Beacon Flood")
+        run_bash_script("attack-beacon/attack.sh", pause=True, capture=False, title="T008 - Beacon Flood")
 
     def run_auth():
-        run_bash_script("attack-auth/attack.sh", pause=True, capture=False, title="Authentication Flood")
-
-    def run_probe():
-        run_bash_script("attack-probe/attack.sh", pause=True, capture=False, title="Directed Probe Response")
+        run_bash_script("attack-auth/attack.sh", pause=True, capture=False, title="T009 - Authentication Flood")
 
     def run_arp_spoof():
-        run_bash_script("attack-arp/attack.sh", pause=True, capture=False, title="ARP Spoofing (bettercap)")
+        run_bash_script("attack-arp/attack.sh", pause=True, capture=False, title="T014 - ARP Spoofing")
+
+    def run_probe():
+        run_bash_script("attack-probe/attack.sh", pause=True, capture=False, title="T016 - Directed Probe Response")
 
     actions = {
         "1": run_deauth,
         "2": run_beacon,
         "3": run_auth,
-        "4": run_probe,
-        "5": run_arp_spoof
+        "4": run_arp_spoof,
+        "5": run_probe
     }
 
     while True:
@@ -364,14 +364,14 @@ def attack_tools():
         print_header("Standalone Attack Tools")
         print()
 
-        print("  [1] Deauthentication Flood")
-        print("  [2] Beacon Flood")
-        print("  [3] Authentication Flood")
-        print("  [4] Probe Response Spoof")
-        print("  [5] ARP Spoofing (bettercap)")
+        print("  [1] Launch Deauthentication Flood Attack (T007)")
+        print("  [2] Launch Beacon Flood Attack (T008)")
+        print("  [3] Launch Authentication Flood Attack (T009)")
+        print("  [4] Launch ARP Spoofing Attack (T014)")
+        print("  [5] Launch Directed Probe Response Attack (T016)")
         print("\n  [0] Return to Main Menu")
 
-        choice = input("\n[+] Select an option: ")
+        choice = input("\n  [+] Select an option: ")
 
         if choice == "0":
             break
