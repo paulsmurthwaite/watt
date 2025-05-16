@@ -9,6 +9,7 @@ IFACE="wlx00c0cab4b58c"
 # Stop hostapd
 echo "{+] Stopping hostapd ... "
 sudo pkill hostapd
+rm -f /tmp/watt_ap_active
 
 # Stop dnsmasq
 echo "{+] Stopping dnsmasq ... "
@@ -41,4 +42,4 @@ sudo ip link set $IFACE up
 echo "{+] Starting NetworkManager ... "
 sudo systemctl start NetworkManager
 
-echo "{+] WSTT-OpenAP DISABLED ... "
+echo "{+] WSTT-WeakAP DISABLED ... "

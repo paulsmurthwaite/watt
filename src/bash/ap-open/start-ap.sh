@@ -27,6 +27,7 @@ echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward > /dev/null
 # Start hostapd
 echo "{+] Starting hostapd ... "
 sudo hostapd "$CONF_DIR/hostapd.conf" -B
+echo "Open Access Point" > /tmp/watt_ap_active
 
 # Stop systemd-resolved
 echo "{+] Stopping systemd-resolved ... "
@@ -51,4 +52,4 @@ else
   echo "{+] Skipping NAT setup (internet blocked for clients) ... "
 fi
 
-echo "{+] WSTT-SecureAP ENABLED ... "
+echo "{+] WSTT-OpenAP ENABLED ... "
