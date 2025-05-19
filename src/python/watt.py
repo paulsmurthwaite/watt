@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 """watt.py
 
-Main entry point for the Wireless Attack Testing Toolkit (WATT) menu interface.
+Main entry point for the Wireless Attack Toolkit (WATT) menu interface.
 
-This script provides a simple, operator-friendly CLI for accessing key toolkit functions such as scanning, capturing, and detection.  It is designed to offer a clear and low-complexity user experience, suitable for field use in SME environments.
+This script provides a simple, operator-friendly CLI for launching predefined
+wireless attack scenarios against test environments. Each scenario maps to a
+specific threat profile and is executed using underlying Bash-based tooling.
 
-The menu system acts as the central launcher for Bash and Python-based components of the toolkit, with screen clearing and section redrawing used to improve usability without introducing graphical complexity.
+WATT is intended for use in isolated lab environments only. It does not capture
+or analyse traffic. Detection and analysis should be performed separately using WSTT.
+
+The menu system acts as the central launcher for attack scripts, using screen
+clearing and section redrawing to support usability without introducing graphical complexity.
 
 Author:      Paul Smurthwaite
-Date:        2025-05-16
+Date:        2025-05-19
 Module:      TM470-25B
 """
 
@@ -64,20 +70,19 @@ def print_divider():
     print()
 
 def print_interface_status():
-    """Print the current interface, state, and mode."""
+    """Print the current interface, state, and mode (monitor/managed)."""
     interface, state_raw, mode_raw = get_interface_details()
 
     state = state_raw.title()
-    mode = "AP" if mode_raw.lower() == "ap" else mode_raw.title()
+    mode = mode_raw.title()
 
     interface_colour = "\033[38;5;226m"
     state_colour = "\033[92m" if state.lower() == "up" else "\033[91m"
+
     if mode_raw.lower() == "managed":
         mode_colour = "\033[92m"
     elif mode_raw.lower() == "monitor":
         mode_colour = "\033[91m"
-    elif mode_raw.lower() == "ap":
-        mode_colour = "\033[93m"
     else:
         mode_colour = "\033[0m"
 
@@ -87,25 +92,16 @@ def print_interface_status():
     print()
 
 def print_service_status():
-    """Display Access Point and Attack Tool status with colour formatting."""
-    ap_file = "/tmp/watt_ap_active"
+    """Display Attack Tool status with colour formatting."""
     atk_file = "/tmp/watt_attack_active"
-
-    ap_raw = "Stopped"
     atk_raw = "Stopped"
-
-    if os.path.exists(ap_file):
-        with open(ap_file, "r") as f:
-            ap_raw = f"Running ({f.read().strip()})"
 
     if os.path.exists(atk_file):
         with open(atk_file, "r") as f:
             atk_raw = f"Running ({f.read().strip()})"
 
-    ap_colour = "\033[92m" if ap_raw.startswith("Stopped") else "\033[93m"
     atk_colour = "\033[92m" if atk_raw.startswith("Stopped") else "\033[91m"
 
-    print(f"[ Access Point ] {ap_colour}{ap_raw}\033[0m")
     print(f"[ Attack Tool  ] {atk_colour}{atk_raw}\033[0m")
     print()
 
@@ -141,12 +137,11 @@ def show_menu():
     print("  [1] Threat Scenarios\n")
 
     print_header("Standalone Tools")
-    print("  [2] Access Points")
-    print("  [3] Attack Tools\n")
+    print("  [2] Attack Tools\n")
 
     print_header("Utilities")
-    print("  [4] Service Control")
-    print("  [5] Help | About")
+    print("  [3] Service Control")
+    print("  [4] Help | About")
 
     print("\n  [0] Exit")
 
@@ -276,60 +271,6 @@ def threat_scenario():
         else:
             pause_on_invalid()
 
-def ap_profiles():
-    """Access Points submenu."""
-
-    def ap_open():
-        run_bash_script("ap-open/start-ap", capture=False, pause=True, title="Open Access Point")
-
-    def ap_wpa2():
-        run_bash_script("ap-wpa2/start-ap", capture=False, pause=True, title="WPA2 Access Point")
-
-    def ap_hidden():
-        run_bash_script("ap-hiddenssid/start-ap", capture=False, pause=True, title="Hidden SSID Access Point")
-
-    def ap_spoofed():
-        run_bash_script("ap-spoofed/start-ap", capture=False, pause=True, title="Spoofed SSID Access Point")
-
-    def ap_misconfig():
-        run_bash_script("ap-misconfig/start-ap", capture=False, pause=True, title="Misconfigured Access Point")
-
-    actions = {
-        "1": ap_open,
-        "2": ap_wpa2,
-        "3": ap_hidden,
-        "4": ap_spoofed,
-        "5": ap_misconfig
-    }
-
-    while True:
-        clear_screen()
-
-        print_subtitle()
-
-        print_header("Standalone Access Point Profiles")
-        print()
-
-        print("  [1] Launch OPN Access Point (Unencrypted)")
-        print("  [2] Launch WPA2 Personal Personal Access Point (WPA2-PSK)")
-        print("  [3] Launch Hidden SSID Access Point (WPA2-PSK)")
-        print("  [4] Launch Spoofed SSID Access Point (OPN)")
-        print("  [5] Launch Misconfigured Access Point (WPA1-TKIP)")
-
-        print("\n  [0] Return to Main Menu")
-
-        choice = input("\n  [+] Select an option: ")
-
-        if choice == "0":
-            break
-
-        action = actions.get(choice)
-        if action:
-            clear_screen()
-            action()
-        else:
-            pause_on_invalid()
-
 def attack_tools():
     """Attack Tools submenu."""
 
@@ -348,12 +289,16 @@ def attack_tools():
     def run_probe():
         run_bash_script("attack-probe/attack.sh", pause=True, capture=False, title="T016 - Directed Probe Response")
 
+    def stop_attack():
+        run_bash_script("stop-attack", pause=True, capture=False, title="Stop Attack")
+
     actions = {
         "1": run_deauth,
         "2": run_beacon,
         "3": run_auth,
         "4": run_arp_spoof,
-        "5": run_probe
+        "5": run_probe,
+        "S": stop_attack
     }
 
     while True:
@@ -369,9 +314,12 @@ def attack_tools():
         print("  [3] Launch Authentication Flood Attack (T009)")
         print("  [4] Launch ARP Spoofing Attack (T014)")
         print("  [5] Launch Directed Probe Response Attack (T016)")
+
+        print("\n  [S] Stop Attack")
+
         print("\n  [0] Return to Main Menu")
 
-        choice = input("\n  [+] Select an option: ")
+        choice = input("\n  [+] Select an option: ").strip().upper()
 
         if choice == "0":
             break
@@ -385,12 +333,6 @@ def attack_tools():
 
 def service_control():
     """Service Control submenu."""
-
-    def stop_ap():
-        run_bash_script("service/stop-ap", pause=True, capture=False, title="Stop Access Point")
-
-    def stop_attacks():
-        run_bash_script("service/stop-attacks", pause=True, capture=False, title="Stop All Attack Tools")
 
     def interface_state():
         """Interface State submenu."""
@@ -510,11 +452,9 @@ def service_control():
                 pause_on_invalid()
 
     actions = {
-        "1": stop_ap,
-        "2": stop_attacks,
-        "3": interface_state,
-        "4": interface_mode,
-        "5": interface_reset
+        "1": interface_state,
+        "2": interface_mode,
+        "3": interface_reset
     }
 
     while True:
@@ -525,11 +465,9 @@ def service_control():
         print_header("Service Control")
         print()
 
-        print("  [1] Stop Access Point")
-        print("  [2] Stop Attack Tools")
-        print("  [3] Change Interface State")
-        print("  [4] Change Interface Mode")
-        print("  [5] Reset Interface")
+        print("  [1] Change Interface State")
+        print("  [2] Change Interface Mode")
+        print("  [3] Reset Interface")
         print("\n  [0] Return to Main Menu")
 
         choice = input("\n  [+] Select an option: ")
@@ -547,6 +485,26 @@ def service_control():
 def help_about():
     """Help | About submenu."""
 
+    clear_screen()
+    print_subtitle()
+    print_header("Help | About")
+
+    print("\nWATT (Wireless Attack Toolkit) provides a menu-driven interface")
+    print("to launch predefined wireless attack scenarios in a controlled")
+    print("testing environment.  Each attack corresponds to a specific threat")
+    print("profile and is executed using underlying Bash-based tools.")
+
+    print("\nThis toolkit is intended for use in isolated lab environments only.")
+    print("All testing must be performed on equipment and networks you own")
+    print("or have explicit permission to test.")
+
+    print("\nCaptured traffic and detections should be handled separately using WSTT.")
+
+    print("\nAuthor: Paul Smurthwaite")
+    print("Module: TM470-25B")
+
+    input("\n[Press Enter to return to menu]")
+
 def main():
     """User input handler."""
 
@@ -557,12 +515,10 @@ def main():
         if choice == "1":
             threat_scenario()
         elif choice == "2":
-            ap_profiles()
-        elif choice == "3":
             attack_tools()
-        elif choice == "4":
+        elif choice == "3":
             service_control()
-        elif choice == "5":
+        elif choice == "4":
             help_about()
         elif choice == "0":
             print("\nExiting to shell.")
