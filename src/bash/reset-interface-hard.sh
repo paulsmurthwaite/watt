@@ -8,10 +8,10 @@ source "$SCRIPT_DIR/config.sh"
 DRIVER=$(basename "$(readlink /sys/class/net/$INTERFACE/device/driver)")
 
 # Remove interface driver
-echo "[INFO] Unloading interface $INTERFACE driver $DRIVER ..."
+echo "[+] Unloading interface $INTERFACE driver $DRIVER ..."
 sudo rmmod $DRIVER
 
 # Reload interface driver
-echo "[INFO] Reloading interface $INTERFACE ..."
+echo "[+] Reloading interface $INTERFACE ..."
 sudo modprobe $DRIVER
 sleep 5

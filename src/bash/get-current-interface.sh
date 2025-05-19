@@ -25,5 +25,5 @@ fi
 if [ -n "$MODE" ]; then
     echo "Mode: $MODE"
 else
-    echo "[WARN] Could not determine mode for interface $INTERFACE."
+    echo "[!] Could not determine mode for interface $INTERFACE."
 fi
