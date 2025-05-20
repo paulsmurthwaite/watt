@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Load config
+# Load helpers
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/config.sh"
 
@@ -25,5 +25,5 @@ fi
 if [ -n "$MODE" ]; then
     echo "Mode: $MODE"
 else
-    echo "[!] Could not determine mode for interface $INTERFACE."
+    echo "[WARN] Could not determine mode for interface $INTERFACE."
 fi
