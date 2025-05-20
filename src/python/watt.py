@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """watt.py
 
-Main entry point for the Wireless Attack Tool Toolkit (WATT) menu interface.
+Main entry point for the Wireless Attack Test Toolkit (WATT) menu interface.
 
 This script provides a simple, operator-friendly CLI for launching predefined
 wireless attack scenarios against test environments. Each scenario maps to a
@@ -51,7 +51,7 @@ def ui_banner():
     print(colour(ascii_banner, "red"))
 
 # UI Header
-def ui_header(title="Wireless Attack Tool Toolkit"):
+def ui_header(title="Wireless Attack Test Toolkit"):
     """
     Display section header.
     """
@@ -572,7 +572,7 @@ def help_about():
     # Header block
     ui_standard_header("Help | About")
 
-    print("WATT (Wireless Attack Tool Toolkit) provides a menu-driven interface")
+    print("WATT (Wireless Attack Test Toolkit) provides a menu-driven interface")
     print("to launch predefined wireless attack scenarios in a controlled")
     print("testing environment.  Each attack corresponds to a specific threat")
     print("profile and is executed using underlying Bash-based tools.")
