@@ -47,7 +47,7 @@ def ui_banner():
     """
     Display ASCII banner.
     """
-    ascii_banner = pyfiglet.figlet_format("WAAT", font="ansi_shadow")
+    ascii_banner = pyfiglet.figlet_format("WATT", font="ansi_shadow")
     print(colour(ascii_banner, "red"))
 
 # UI Header
@@ -221,7 +221,9 @@ def show_menu():
     # Exit option
     print("\n[0] Exit")
 
-def run_bash_script(script_name, pause=True, capture=True, title=None, clear=True):
+# ─── Bash Script Handler ───
+#
+def run_bash_script(script_name, pause=True, capture=True, clear=True, title=None):
     """
     Executes a Bash script located under /src/bash.
     
@@ -237,7 +239,7 @@ def run_bash_script(script_name, pause=True, capture=True, title=None, clear=Tru
         ui_header(title)
         print()
 
-    # Script full path
+    # Bash script path
     script_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "bash", f"{script_name}.sh")
     )
@@ -259,7 +261,7 @@ def run_bash_script(script_name, pause=True, capture=True, title=None, clear=Tru
     
     except subprocess.CalledProcessError as e:
         if e.returncode == 124:
-            print(f"[!] Script timed out after specified duration.")
+            print(f"[x] Script timed out after specified duration.")
         else:
             print(f"[x] Script failed: {script_name}.sh")
             if e.stderr:
