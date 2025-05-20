@@ -1,5 +1,5 @@
-# WATT Attacker Environment
-This repository contains configuration files, scripts, and tooling for the Wireless Attack Test Toolkit (WATT) environment.  It supports the Wireless Security Testing Toolkit (WSTT) project by generating realistic, controlled wireless attack scenarios.
+# Wireless Attack Testing Toolkit (WATT)
+This repository contains configuration files, scripts, and tooling for the Wireless Attack Testing Toolkit (WATT) environment.  It supports the Wireless Security Testing Toolkit (WSTT) project by generating realistic, controlled wireless attack scenarios.
 
 ## Repository Structure
 - attacks/ – Per-threat scenario folders for each implemented attack

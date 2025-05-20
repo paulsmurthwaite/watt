@@ -51,7 +51,7 @@ def ui_banner():
     print(colour(ascii_banner, "red"))
 
 # UI Header
-def ui_header(title="Wireless Attack Test Toolkit"):
+def ui_header(title="Wireless Attack Testing Toolkit"):
     """
     Display section header.
     """
@@ -574,7 +574,7 @@ def help_about():
     # Header block
     ui_standard_header("Help | About")
 
-    print("WATT (Wireless Attack Test Toolkit) provides a menu-driven interface")
+    print("WATT (Wireless Attack Testing Toolkit) provides a menu-driven interface")
     print("to launch predefined wireless attack scenarios in a controlled")
     print("testing environment.  Each attack corresponds to a specific threat")
     print("profile and is executed using underlying Bash-based tools.")
