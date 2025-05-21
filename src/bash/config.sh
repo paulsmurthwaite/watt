@@ -27,3 +27,4 @@ T016_PROBE_CHANNEL=6
 
 # T014
 T014_TARGET_IP="10.0.0.120"  # Known client IP
+T014_INTERFACE="ens33"  # WATT forwarding interface

