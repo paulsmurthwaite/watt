@@ -63,7 +63,7 @@ trap cleanup SIGINT
 
 # Validate config vars
 if [[ -z "$INTERFACE" || -z "$T016_PROBE_SSID" || -z "$T016_PROBE_BSSID" || -z "$T016_PROBE_CHANNEL" ]]; then
-    print_warn "Required variables not defined in config.sh: INTERFACE, T016_PROBE_SSID, or T016_PROBE_CHANNEL"
+    print_warn "Required variables not defined in config.sh: INTERFACE, T016_PROBE_SSID, T016_PROBE_BSSID, or T016_PROBE_CHANNEL"
     exit 0
 fi
 
@@ -113,7 +113,7 @@ fi
 
 # Run attack
 print_blank
-print_info "Running T016 - Directed Probe Response for $DURATION seconds"
+print_info "Running T016 - Directed Probe Response attack for $DURATION seconds"
 sudo timeout "$DURATION" airbase-ng -e "$T016_PROBE_SSID" -c "$T016_PROBE_CHANNEL" -a "$T016_PROBE_BSSID" "$INTERFACE"
 
 EXIT_CODE=$?

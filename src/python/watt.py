@@ -367,7 +367,7 @@ def dev_tools():
         run_bash_script("utilities/run_mdk4_auth", pause=True, capture=False, clear=False, title="T009 - Authentication Flood")
 
     def run_arp_spoof():
-        run_bash_script("utilities/arp_spoof", pause=True, capture=False, clear=False, title="T014 - ARP Spoofing")
+        run_bash_script("utilities/run_bettercap_arp", pause=True, capture=False, clear=False, title="T014 - ARP Spoofing")
 
     def run_probe():
         run_bash_script("utilities/run_airbase_probe", pause=True, capture=False, clear=False, title="T016 - Directed Probe Response")

