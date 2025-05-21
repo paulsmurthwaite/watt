@@ -364,7 +364,7 @@ def dev_tools():
         run_bash_script("utilities/run_mdk4_beacon", pause=True, capture=False, clear=False, title="T008 - Beacon Flood")
 
     def run_auth():
-        run_bash_script("utilities/attack.sh", pause=True, capture=False, clear=False, title="T009 - Authentication Flood")
+        run_bash_script("utilities/run_mdk4_auth", pause=True, capture=False, clear=False, title="T009 - Authentication Flood")
 
     def run_arp_spoof():
         run_bash_script("utilities/attack.sh", pause=True, capture=False, clear=False, title="T014 - ARP Spoofing")

@@ -66,12 +66,12 @@ if [[ -z "$INTERFACE" || -z "$T008_INTERVAL" ]]; then
 fi
 
 # Display config
-echo "Interface    : $INTERFACE"
 echo "Mode         : T008 - Beacon Flood"
+echo "Interface    : $INTERFACE"
 print_blank
 
 # Confirm attack
-print_prompt "[?] Proceed with attack? (y/N): "
+print_prompt "Proceed with attack? (y/N): "
 read -r confirm
 
 if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
