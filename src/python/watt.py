@@ -361,16 +361,16 @@ def dev_tools():
         run_bash_script("utilities/run_mdk4_deauth", pause=True, capture=False, clear=False, title="T007 - Deauthentication Flood")
 
     def run_beacon():
-        run_bash_script("attacks/attack.sh", pause=True, capture=False, clear=False, title="T008 - Beacon Flood")
+        run_bash_script("utilities/run_mdk4_beacon", pause=True, capture=False, clear=False, title="T008 - Beacon Flood")
 
     def run_auth():
-        run_bash_script("attacks/attack.sh", pause=True, capture=False, clear=False, title="T009 - Authentication Flood")
+        run_bash_script("utilities/attack.sh", pause=True, capture=False, clear=False, title="T009 - Authentication Flood")
 
     def run_arp_spoof():
-        run_bash_script("attacks/attack.sh", pause=True, capture=False, clear=False, title="T014 - ARP Spoofing")
+        run_bash_script("utilities/attack.sh", pause=True, capture=False, clear=False, title="T014 - ARP Spoofing")
 
     def run_probe():
-        run_bash_script("attacks/attack.sh", pause=True, capture=False, clear=False, title="T016 - Directed Probe Response")
+        run_bash_script("utilities/attack.sh", pause=True, capture=False, clear=False, title="T016 - Directed Probe Response")
 
     def stop_attack():
         run_bash_script("stop-attack", pause=True, capture=False, clear=False, title="Stop Attack")

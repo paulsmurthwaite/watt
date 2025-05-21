@@ -9,5 +9,9 @@ INTERFACE="wlx00c0cab68175"
 BSSID="02:00:00:00:00:02"
 CHANNEL="6"
 
-# Attack durations
-T007_ATTACK_DURATION=60
+# Common
+ATTACK_DURATION=60
+
+# T008
+T008_INTERVAL=100  # Beacon send interval in milliseconds
+T008_SSID_FILE=t008-ssids.txt
