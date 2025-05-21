@@ -121,11 +121,14 @@ if [[ "$MODE" != "monitor" ]]; then
 fi
 
 # Check SSIDs
-SSID_FILE="$SCRIPT_DIR/$T008_SSID_FILE"
+LOCAL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SSID_FILE="$LOCAL_DIR/$T008_SSID_FILE"
 
 if [[ -f "$SSID_FILE" ]]; then
+    print_blank
     print_info "Using existing SSID list: $T008_SSID_FILE"
 else
+    print_blank
     print_action "Generating SSID list: $T008_SSID_FILE"
     seq -f "SSID-%03g" 1 100 > "$SSID_FILE"
     print_success "Generated 100 SSIDs"
