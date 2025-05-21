@@ -62,7 +62,7 @@ trap cleanup EXIT
 trap cleanup SIGINT
 
 # Validate config vars
-if [[ -z "$INTERFACE" || -z "$T016_PROBE_SSID" || -z "$T016_PROBE_CHANNEL" ]]; then
+if [[ -z "$INTERFACE" || -z "$T016_PROBE_SSID" || -z "$T016_PROBE_BSSID" || -z "$T016_PROBE_CHANNEL" ]]; then
     print_warn "Required variables not defined in config.sh: INTERFACE, T016_PROBE_SSID, or T016_PROBE_CHANNEL"
     exit 0
 fi
