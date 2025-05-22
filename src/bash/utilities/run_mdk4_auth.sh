@@ -23,11 +23,22 @@
 # Notes:
 #   - Automatically enables monitor mode if needed
 #   - Cleans up on SIGINT or timeout using EXIT trap
+#   - Forms the basis for T009
 
-# Load helpers
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-source "$SCRIPT_DIR/config.sh"
-source "$SCRIPT_DIR/print.sh"
+# ─── Paths ───
+BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CONFIG_DIR="$BASH_DIR/config"
+HELPERS_DIR="$BASH_DIR/helpers"
+UTILITIES_DIR="$BASH_DIR/utilities"
+
+# ─── Configs ───
+source "$CONFIG_DIR/global.conf"
+source "$CONFIG_DIR/atk_mdk4_auth.conf"
+
+# ─── Helpers ───
+source "$HELPERS_DIR/fn_print.sh"
+source "$HELPERS_DIR/fn_mode.sh"
+source "$HELPERS_DIR/fn_cleanup.sh"
 
 # Check mdk4
 if ! command -v mdk4 &> /dev/null; then
@@ -35,37 +46,20 @@ if ! command -v mdk4 &> /dev/null; then
     exit 0
 fi
 
-# Cleanup
-cleanup() {
-    print_blank
-    print_info "Starting cleanup"
-    rm -f /tmp/watt_attack_active
-
-    # Check mode
-    MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
-    if [[ "$MODE" != "managed" ]]; then
-        print_action "Reverting to Managed mode"
-        bash "$SCRIPT_DIR/set-mode-managed.sh"
-        print_success "Interface set to Managed mode"
-    fi
-
-    exit 0   
-}
-
 # Exit traps
 trap cleanup EXIT
 trap cleanup SIGINT
 
 # Validate config vars
-if [[ -z "$INTERFACE" || -z "$T009_AUTH_PPS" || -z "$T009_BSSID" ]]; then
-    print_warn "Required variables not defined in config.sh: INTERFACE, T009_AUTH_PPS, or T009_BSSID"
+if [[ -z "$INTERFACE" || -z "$ATK_AUTH_PPS" || -z "$ATK_BSSID" ]]; then
+    print_warn "INTERFACE, ATK_AUTH_PPS, or ATK_BSSID not defined in atk_mdk4_auth.conf"
     exit 0
 fi
 
 # Display config
 echo "Mode         : T009 - Authentication Flood"
 echo "Interface    : $INTERFACE"
-echo "Target BSSID : $T009_BSSID"
+echo "Target BSSID : $ATK_BSSID"
 print_blank
 
 # Confirm attack
@@ -79,10 +73,10 @@ fi
 
 # Input target BSSID
 while true; do
-    print_prompt "Target BSSID [default: ${T009_BSSID}]: "
+    print_prompt "Target BSSID [default: ${ATK_BSSID}]: "
     read -r BSSID
 
-    BSSID="${BSSID:-$T009_BSSID}"
+    BSSID="${BSSID:-$ATK_BSSID}"
     
     if [[ "$BSSID" =~ ^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$ ]]; then
         break
@@ -93,10 +87,10 @@ done
 
 # Input packet rate
 while true; do
-    print_prompt "Transmit rate (pps) [default: ${T009_AUTH_PPS}]: "
+    print_prompt "Transmit rate (pps) [default: ${ATK_AUTH_PPS}]: "
     read -r PACKET_RATE
 
-    PACKET_RATE="${PACKET_RATE:-$T009_AUTH_PPS}"
+    PACKET_RATE="${PACKET_RATE:-$ATK_AUTH_PPS}"
 
     if [[ "$PACKET_RATE" =~ ^[0-9]+$ ]]; then
         break
@@ -107,10 +101,10 @@ done
 
 # Input duration
 while true; do
-    print_prompt "Duration (seconds) [default: ${ATTACK_DURATION}]: "
+    print_prompt "Duration (seconds) [default: ${ATK_DURATION}]: "
     read -r DURATION
 
-    DURATION="${DURATION:-$ATTACK_DURATION}"
+    DURATION="${DURATION:-$ATK_DURATION}"
     
     if [[ "$DURATION" =~ ^[0-9]+$ ]]; then
         break
@@ -124,13 +118,8 @@ echo "T009" > /tmp/watt_attack_active
 print_blank
 print_info "Starting Attack"
 
-# Check mode
-MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
-if [[ "$MODE" != "monitor" ]]; then
-    print_action "Enabling Monitor mode"
-    bash "$SCRIPT_DIR/set-mode-monitor.sh"
-    print_success "Interface set to Monitor mode"
-fi
+# Set monitor mode
+ensure_monitor_mode
 
 # Run attack
 print_blank

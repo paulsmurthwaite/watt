@@ -4,17 +4,22 @@
 
 set -e
 
-# Load helpers
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/config.sh"
-source "$SCRIPT_DIR/print.sh"
+# ─── Paths ───
+BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CONFIG_DIR="$BASH_DIR/config"
+HELPERS_DIR="$BASH_DIR/helpers"
+UTILITIES_DIR="$BASH_DIR/utilities"
 
-# Define known attack processes to kill
-ATTACK_PROCESSES=("mdk4" "bettercap" "aireplay-ng")
+# ─── Configs ───
+source "$CONFIG_DIR/global.conf"
+source "$CONFIG_DIR/atk_airbase_probe.conf"
+
+# ─── Helpers ───
+source "$HELPERS_DIR/fn_print.sh"
 
 print_action "Stopping active attack processes"
 
-for proc in "${ATTACK_PROCESSES[@]}"; do
+for proc in "${ATK_PROCESSES[@]}"; do
     if pgrep "$proc" > /dev/null; then
         print_action "Killing $proc"
         sudo pkill "$proc"

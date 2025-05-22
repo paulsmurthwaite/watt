@@ -1,8 +1,15 @@
 #!/bin/bash
 
-# Load helpers
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/config.sh"
+# ─── Paths ───
+BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="$BASH_DIR/config"
+HELPERS_DIR="$BASH_DIR/helpers"
+
+# ─── Configs ───
+source "$CONFIG_DIR/global.conf"
+
+# ─── Helpers ───
+source "$HELPERS_DIR/fn_print.sh"
 
 # Read interface state
 LINK_OUTPUT=$(ip link show "$INTERFACE")
@@ -12,18 +19,18 @@ STATE=$(echo "$LINK_OUTPUT" | grep "UP")  # Extract UP indicator
 MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
 
 # Display interface
-echo "Interface: $INTERFACE"
+print_none "Interface: $INTERFACE"
 
 # Display interface state
 if [ -n "$STATE" ]; then
-    echo "State: UP"
+    print_none "State: UP"
 else
-    echo "State: DOWN"
+    print_none "State: DOWN"
 fi
 
 # Display interface mode
 if [ -n "$MODE" ]; then
-    echo "Mode: $MODE"
+    print_none "Mode: $MODE"
 else
-    echo "[WARN] Could not determine mode for interface $INTERFACE."
+    print_warn "Could not determine mode for interface $INTERFACE."
 fi

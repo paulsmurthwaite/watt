@@ -1,9 +1,15 @@
 #!/bin/bash
 
-# Load config
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/config.sh"
-source "$SCRIPT_DIR/print.sh"
+# ─── Paths ───
+BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="$BASH_DIR/config"
+HELPERS_DIR="$BASH_DIR/helpers"
+
+# ─── Configs ───
+source "$CONFIG_DIR/global.conf"
+
+# ─── Helpers ───
+source "$HELPERS_DIR/fn_print.sh"
 
 # Bring interface up
 print_action "Setting interface UP"
