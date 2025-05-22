@@ -4,6 +4,7 @@
 BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIG_DIR="$BASH_DIR/config"
 HELPERS_DIR="$BASH_DIR/helpers"
+SERVICES_DIR="$BASH_DIR/services"
 SCENARIO_DIR="$BASH_DIR/scenarios"
 
 # ─── Configs ───
