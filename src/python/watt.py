@@ -208,14 +208,15 @@ def show_menu():
     ui_standard_header("Main Menu")
 
     # Menu block
-    ui_header("Automated/Guided Playbooks")
+    ui_header("Playbooks")
     print("[1] Threat Scenarios")
     print()
-    ui_header("Developer Tools")
+    ui_header("Tools")
     print("[2] Attack Tools")
     print()
-    ui_header("Utilities")
+    ui_header("Services")
     print("[3] Service Control")
+    print()
     print("[4] Help | About")
 
     # Exit option
