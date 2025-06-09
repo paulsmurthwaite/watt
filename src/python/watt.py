@@ -258,18 +258,18 @@ def show_menu():
 
     # Menu block
     ui_header("Playbooks")
-    print("[1] Threat Scenarios")
+    print("[1]  Threat Scenarios")
     print()
     ui_header("Tools")
-    print("[2] Attack Tools")
+    print("[2]  Attack Tools")
     print()
     ui_header("Services")
-    print("[3] Service Control")
+    print("[3]  Service Control")
     print()
-    print("[4] Help | About")
+    print("[4]  Help | About")
 
     # Exit option
-    print("\n[0] Exit")
+    print("\n[0]  Exit")
 
 # ─── Bash Script Handler ───
 #
@@ -342,6 +342,9 @@ def threat_scenario():
     def threat_t007():
         run_bash_script("scenarios/run_t007", pause=True, capture=False, clear=True, title="Threat Scenario: Deauthentication Flood (T007)")
 
+    def threat_t008():
+        run_bash_script("scenarios/run_t008", pause=True, capture=False, clear=True, title="Threat Scenario: Beacon Flood (T008)")
+
     def threat_t009():
         run_bash_script("scenarios/run_t009", pause=True, capture=False, clear=False, title="Threat Scenario: Authentication Flood (T009)")
 
@@ -351,20 +354,17 @@ def threat_scenario():
     def threat_t015():
         run_bash_script("scenarios/run_t015", pause=True, capture=False, clear=False, title="Threat Scenario: Malicious Hotspot Auto-Connect (T015)")
 
-    def threat_t016():
-        run_bash_script("scenarios/run_t016", pause=True, capture=False, clear=False, title="Threat Scenario: Directed Probe Response (T016)")
-
     actions = {
         "1":  threat_t001,
         "2":  threat_t002,
         "3":  threat_t004,
         "4":  threat_t005,
         "5":  threat_t006,
-        "6":  threat_t007,
-        "7":  threat_t009,
-        "8":  threat_t014,
-        "9":  threat_t015,
-        "10": threat_t016
+        "6":  threat_t008,
+        "7":  threat_t007,      
+        "8":  threat_t009,
+        "9":  threat_t014,
+        "10":  threat_t015
     }
 
     while True:
@@ -375,22 +375,24 @@ def threat_scenario():
 
         # Menu block
         ui_header("Access Point Threats")
-        print("[1]   Run Unencrypted Traffic Capture scenario (T001)")
-        print("[2]   Run Probe Request Snooping scenario (T002)")
-        print("[3]   Run Evil Twin Attack scenario (T004)")
-        print("[4]   Run Open Rogue AP scenario (T005)")
-        print("[5]   Run Misconfigured Access Point scenario (T006)")
+        print("[1]  Run Unencrypted Traffic Capture scenario (T001)")
+        print("[2]  Run Probe Request Snooping scenario (T002)")
+        print("[3]  Run Evil Twin Attack scenario (T004)")
+        print("[4]  Run Open Rogue AP scenario (T005)")
+        print("[5]  Run Misconfigured Access Point scenario (T006)")
+        print("[6]  Run Beacon Flood scenario (T008)")
         print()
+
         ui_header("Client Exploits")
-        print("[6]   Run Deauthentication Flood scenario (T007)")
-        print("[7]   Run Authentication Flood scenario (T009)")
-        print("[8]   Run ARP Spoofing from Wireless Entry Point scenario (T014)")
-        print("[9]   Run Malicious Hotspot Auto-Connect scenario (T015)")
-        print("[10]  Run Directed Probe Response scenario (T016)")
-        print("\n[0] Return to Main Menu")
+        print("[7]  Run Deauthentication Flood scenario (T007)")
+        print("[8]  Run Authentication Flood scenario (T009)")
+        print("[9]  Run ARP Spoofing from Wireless Entry Point scenario (T014)")
+        print("[10] Run Malicious Hotspot Auto-Connect scenario (T015)")
+
+        print("\n[0]  Return to Main Menu")
 
         # Input
-        choice = input("\n[?] Select an option: ")
+        choice = input("\n[?]  Select an option: ")
 
         if choice == "0":
             break
@@ -440,16 +442,16 @@ def dev_tools():
         # Header block
         ui_standard_header("Attack Tools")
 
-        print("[1] Launch Deauthentication Flood Attack (T007)")
-        print("[2] Launch Beacon Flood Attack (T008)")
-        print("[3] Launch Authentication Flood Attack (T009)")
-        print("[4] Launch ARP Spoofing Attack (T014)")
-        print("[5] Launch Directed Probe Response Attack (T016)")
-        print("\n[S] Stop Attack")
-        print("\n[0] Return to Main Menu")
+        print("[1]  Launch Deauthentication Flood Attack (T007)")
+        print("[2]  Launch Beacon Flood Attack (T008)")
+        print("[3]  Launch Authentication Flood Attack (T009)")
+        print("[4]  Launch ARP Spoofing Attack (T014)")
+        print("[5]  Launch Directed Probe Response Attack (T016)")
+        print("\n[S]  Stop Attack")
+        print("\n[0]  Return to Main Menu")
 
         # Input
-        choice = input("\n[?] Select an option: ").strip().upper()
+        choice = input("\n[?]  Select an option: ").strip().upper()
 
         if choice == "0":
             break
@@ -489,12 +491,12 @@ def service_control():
             ui_standard_header("Set Interface State")
                     
             # Menu block                    
-            print("[1] Set interface state DOWN")
-            print("[2] Set interface state UP")
-            print("\n[0] Return to Service Control Menu")
+            print("[1]  Set interface state DOWN")
+            print("[2]  Set interface state UP")
+            print("\n[0]  Return to Service Control Menu")
 
             # Input
-            choice = input("\n[?] Select an option: ")
+            choice = input("\n[?]  Select an option: ")
 
             if choice == "0":
                 break
@@ -529,12 +531,12 @@ def service_control():
             ui_standard_header("Set Interface Mode")
 
             # Menu block
-            print("[1] Set interface mode MANAGED")
-            print("[2] Set interface mode MONITOR")
-            print("\n[0] Return to Service Control Menu")
+            print("[1]  Set interface mode MANAGED")
+            print("[2]  Set interface mode MONITOR")
+            print("\n[0]  Return to Service Control Menu")
 
             # Input
-            choice = input("\n[?] Select an option: ")
+            choice = input("\n[?]  Select an option: ")
 
             if choice == "0":
                 break
@@ -568,12 +570,12 @@ def service_control():
             # Header block
             ui_standard_header("Reset Interface")
 
-            print("[1] Perform Soft Reset (Interface Down/Up)")
-            print("[2] Perform Hard Reset (Interface Unload/Reload)")
-            print("\n[0] Return to Service Control Menu")
+            print("[1]  Perform Soft Reset (Interface Down/Up)")
+            print("[2]  Perform Hard Reset (Interface Unload/Reload)")
+            print("\n[0]  Return to Service Control Menu")
 
             # Input
-            choice = input("\n[?] Select an option: ")
+            choice = input("\n[?]  Select an option: ")
 
             if choice == "0":
                 break
@@ -597,13 +599,13 @@ def service_control():
         # Header block
         ui_standard_header("Service Control")
 
-        print("[1] Change Interface State")
-        print("[2] Change Interface Mode")
-        print("[3] Reset Interface")
-        print("\n[0] Return to Main Menu")
+        print("[1]  Change Interface State")
+        print("[2]  Change Interface Mode")
+        print("[3]  Reset Interface")
+        print("\n[0]  Return to Main Menu")
 
         # Input
-        choice = input("\n[?] Select an option: ")
+        choice = input("\n[?]  Select an option: ")
 
         if choice == "0":
             break
@@ -648,7 +650,7 @@ def main():
     """
     while True:
         show_menu()
-        choice = input("\n[?] Select an option: ")
+        choice = input("\n[?]  Select an option: ")
         
         if choice == "1":
             threat_scenario()
