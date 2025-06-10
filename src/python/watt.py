@@ -325,19 +325,19 @@ def threat_scenario():
     Launch Threat Scenario submenu.
     """
     def threat_t001():
-        run_bash_script("scenarios/run_t001", pause=True, capture=False, clear=False, title="Threat Scenario: Unencrypted Traffic Capture (T001)")
+        run_bash_script("scenarios/run_t001", pause=True, capture=False, clear=True, title="Threat Scenario: Unencrypted Traffic Capture (T001)")
 
     def threat_t002():
-        run_bash_script("scenarios/run_t002", pause=True, capture=False, clear=False, title="Threat Scenario: Probe Request Snooping (T002)")
+        run_bash_script("scenarios/run_t002", pause=True, capture=False, clear=True, title="Threat Scenario: Probe Request Snooping (T002)")
 
     def threat_t004():
-        run_bash_script("scenarios/run_t004", pause=True, capture=False, clear=False, title="Threat Scenario: Evil Twin Attack (T004)")
+        run_bash_script("scenarios/run_t004", pause=True, capture=False, clear=True, title="Threat Scenario: Evil Twin Attack (T004)")
 
     def threat_t005():
-        run_bash_script("scenarios/run_t005", pause=True, capture=False, clear=False, title="Threat Scenario: Open Rogue AP (T005)")
+        run_bash_script("scenarios/run_t005", pause=True, capture=False, clear=True, title="Threat Scenario: Open Rogue AP (T005)")
 
     def threat_t006():
-        run_bash_script("scenarios/run_t006", pause=True, capture=False, clear=False, title="Threat Scenario: Misconfigured Access Point (T006)")
+        run_bash_script("scenarios/run_t006", pause=True, capture=False, clear=True, title="Threat Scenario: Misconfigured Access Point (T006)")
 
     def threat_t007():
         run_bash_script("scenarios/run_t007", pause=True, capture=False, clear=True, title="Threat Scenario: Deauthentication Flood (T007)")
@@ -346,13 +346,13 @@ def threat_scenario():
         run_bash_script("scenarios/run_t008", pause=True, capture=False, clear=True, title="Threat Scenario: Beacon Flood (T008)")
 
     def threat_t009():
-        run_bash_script("scenarios/run_t009", pause=True, capture=False, clear=False, title="Threat Scenario: Authentication Flood (T009)")
+        run_bash_script("scenarios/run_t009", pause=True, capture=False, clear=True, title="Threat Scenario: Authentication Flood (T009)")
 
     def threat_t014():
-        run_bash_script("scenarios/run_t014", pause=True, capture=False, clear=False, title="Threat Scenario: ARP Spoofing from Wireless Entry Point (T014)")
+        run_bash_script("scenarios/run_t014", pause=True, capture=False, clear=True, title="Threat Scenario: ARP Spoofing from Wireless Entry Point (T014)")
 
     def threat_t015():
-        run_bash_script("scenarios/run_t015", pause=True, capture=False, clear=False, title="Threat Scenario: Malicious Hotspot Auto-Connect (T015)")
+        run_bash_script("scenarios/run_t015", pause=True, capture=False, clear=True, title="Threat Scenario: Malicious Hotspot Auto-Connect (T015)")
 
     actions = {
         "1":  threat_t001,
