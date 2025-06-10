@@ -9,7 +9,7 @@ SCENARIO_DIR="$BASH_DIR/scenarios"
 
 # ─── Configs ───
 source "$CONFIG_DIR/global.conf"
-source "$CONFIG_DIR/t009.conf"
+source "$CONFIG_DIR/t014.conf"
 
 # ─── Helpers ───
 source "$HELPERS_DIR/fn_print.sh"
@@ -39,25 +39,24 @@ wait_for_go() {
 }
 
 # ─── Scenario Introduction ───
-print_none "This scenario simulates a denial of service condition by sending"
-print_none "a rapid stream of fake authentication requests to a target"
-print_none "access point.  This can overload the AP's association table or"
-print_none "CPU resources, disrupting service for legitimate clients."
+print_none "This scenario simulates a man-in-the-middle (MiTM) attack via ARP"
+print_none "spoofing, launched from a rogue wireless entry point.  It targets"
+print_none "a client and gateway to hijack traffic, enabling packet interception"
+print_none "or manipulation."
 print_blank
 
 # ─── Access Point Instructions ───
 print_section "Scenario Pre-requisites"
-print_none "1. WPA2-PSK Access Point with associated client"
+print_none "1. Open Access Point with associated client"
 print_none "2. WSTT full/filtered capture"
 print_blank
 
 # ─── Launch Parameters ───
 print_section "Scenario Parameters"
-print_none "Scenario  : $T009_NAME ($T009_ID)"
-print_none "Interface : $INTERFACE"
-print_none "Tool      : $T009_TOOL"
-print_none "Mode      : $T009_MODE"
-print_none "PPS       : $T009_AUTH_PPS"
+print_none "Scenario   : $T014_NAME ($T014_ID)"
+print_none "Interface  : $INTERFACE"
+print_none "Tool       : $T014_TOOL"
+print_none "Mode       : $T014_MODE"
 print_blank
 
 # ─── User Confirmation ───
@@ -67,10 +66,11 @@ read -r READY
 print_blank
 
 # ─── WAPT Coordination ───
-print_section "Access Point Preparation"
-print_action "Launch a WPA2-PSK Access Point"
-print_none "BSSID     : $T009_BSSID"
-print_none "Channel   : $T009_CHANNEL"
+print_section "Access Point & Client Preparation"
+print_action "Launch a OPEN Access Point and associate a client device"
+print_none "Client IP  : $T014_TARGET_IP"
+print_none "Gateway IP : $T014_TARGET_GW"
+print_none "Forward IF : $T014_FWD_INTERFACE"
 print_blank
 
 # ─── User Confirmation ───
@@ -78,15 +78,15 @@ if [[ "$ORCHESTRATION" == "1" ]]; then
     touch /tmp/watt_ready_ap
     wait_for_go "ap"
 else
-    user_confirmation "Confirm Access Point" || exit 0
+    user_confirmation "Confirm Access Point and client are active" || exit 0
 fi
 
 # ─── WSTT Coordination ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full or filtered capture using WSTT"
-print_none "BSSID     : $T009_BSSID"
-print_none "Channel   : $T009_CHANNEL"
-print_none "Duration  : $T009_DURATION seconds"
+print_none "BSSID      : $T014_BSSID"
+print_none "Channel    : $T014_CHANNEL"
+print_none "Duration   : $T014_DURATION seconds"
 print_blank
 
 # ─── User / Orchestration Sync ───
@@ -99,7 +99,7 @@ fi
 
 # ─── Signal Cleanup on Exit ───
 cleanup() {
-    rm -f /tmp/watt_ready_t009
+    rm -f /tmp/watt_ready_t014
     rm -f /tmp/watt_ready_capture
 }
 trap cleanup EXIT
@@ -107,12 +107,12 @@ trap cleanup EXIT
 # ─── Attack Execution ───
 print_section "Simulation Running"
 print_action "Launching simulation"
-print_waiting "Running $T009_NAME ($T009_ID)"
-touch /tmp/watt_ready_t009  # Ready marker
+print_waiting "Running $T014_NAME ($T014_ID)"
+touch /tmp/watt_ready_t014  # Ready marker
 if [[ "$ORCHESTRATION" == "1" ]]; then
-    bash "$SCENARIO_DIR/exec_t009.sh" --wait
+    bash "$SCENARIO_DIR/exec_t014.sh" --wait
 else
-    bash "$SCENARIO_DIR/exec_t009.sh"
+    bash "$SCENARIO_DIR/exec_t014.sh"
 fi
 print_success "Simulation complete"
 print_blank
@@ -120,6 +120,6 @@ print_blank
 # ─── Post-Simulation Instructions ───
 print_section "Simulation Complete"
 print_action "Run WSTT detection scripts against the saved PCAP file"
-print_action "Review the capture in Wireshark (filter: $T009_FILTER_HINT)"
+print_action "Review the capture in Wireshark (filter: $T014_FILTER_HINT)"
 
 exit 0

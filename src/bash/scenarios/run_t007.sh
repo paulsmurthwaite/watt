@@ -80,7 +80,7 @@ fi
 
 # ─── WSTT Coordination ───
 print_section "WSTT Capture Preparation"
-print_action "Launch a full/filtered capture"
+print_action "Launch a full or filtered capture using WSTT"
 print_none "BSSID     : $T007_BSSID"
 print_none "Channel   : $T007_CHANNEL"
 print_none "Duration  : $T007_DURATION seconds"
