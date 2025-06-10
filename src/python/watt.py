@@ -354,6 +354,9 @@ def threat_scenario():
     def threat_t015():
         run_bash_script("scenarios/run_t015", pause=True, capture=False, clear=True, title="Threat Scenario: Malicious Hotspot Auto-Connect (T015)")
 
+    def threat_t016():
+        run_bash_script("scenarios/run_t016", pause=True, capture=False, clear=True, title="Threat Scenario: Directed Probe Response (T016)")
+
     actions = {
         "1":  threat_t001,
         "2":  threat_t002,
@@ -364,7 +367,8 @@ def threat_scenario():
         "7":  threat_t007,      
         "8":  threat_t009,
         "9":  threat_t014,
-        "10":  threat_t015
+        "10":  threat_t015,
+        "11":  threat_t016
     }
 
     while True:
@@ -383,11 +387,12 @@ def threat_scenario():
         print("[6]  Run Beacon Flood scenario (T008)")
         print()
 
-        ui_header("Client Exploits")
+        ui_header("Client-side Threats")
         print("[7]  Run Deauthentication Flood scenario (T007)")
         print("[8]  Run Authentication Flood scenario (T009)")
         print("[9]  Run ARP Spoofing from Wireless Entry Point scenario (T014)")
         print("[10] Run Malicious Hotspot Auto-Connect scenario (T015)")
+        print("[11] Run Directed Probe Response scenario (T016)")
 
         print("\n[0]  Return to Main Menu")
 

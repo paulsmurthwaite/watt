@@ -97,7 +97,7 @@ ensure_monitor_mode
 # Run attack
 print_blank
 print_info "Running T016 - Directed Probe Response attack for $DURATION seconds"
-sudo timeout "$DURATION" airbase-ng -e "$ATK_PROBE_SSID" -c "$ATK_PROBE_BSSID" -a "$ATK_PROBE_BSSID" "$INTERFACE"
+sudo timeout "$DURATION" airbase-ng -e "$ATK_PROBE_SSID" -c "$ATK_CHANNEL" -a "$ATK_PROBE_BSSID" "$INTERFACE"
 
 EXIT_CODE=$?
 
