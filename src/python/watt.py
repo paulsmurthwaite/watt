@@ -269,7 +269,7 @@ def show_menu():
     print("[4]  Help | About")
 
     # Exit option
-    print("\n[0]  Exit")
+    print(colour("\n[0]  Exit", "warning"))
 
 # ─── Bash Script Handler ───
 #
@@ -394,10 +394,10 @@ def threat_scenario():
         print("[10] Run Malicious Hotspot Auto-Connect scenario (T015)")
         print("[11] Run Directed Probe Response scenario (T016)")
 
-        print("\n[0]  Return to Main Menu")
+        print(colour("\n[0]  Return to Main Menu", "warning"))
 
         # Input
-        choice = input("\n[?]  Select an option: ")
+        choice = input(colour("\n[?]  Select an option: ", "success"))
 
         if choice == "0":
             break
@@ -453,10 +453,10 @@ def dev_tools():
         print("[4]  Launch ARP Spoofing Attack (T014)")
         print("[5]  Launch Directed Probe Response Attack (T016)")
         print("\n[S]  Stop Attack")
-        print("\n[0]  Return to Main Menu")
+        print(colour("\n[0]  Return to Main Menu", "warning"))
 
         # Input
-        choice = input("\n[?]  Select an option: ").strip().upper()
+        choice = input(colour("\n[?]  Select an option: ", "success")).strip().upper()
 
         if choice == "0":
             break
@@ -501,7 +501,7 @@ def service_control():
             print("\n[0]  Return to Service Control Menu")
 
             # Input
-            choice = input("\n[?]  Select an option: ")
+            choice = input(colour("\n[?]  Select an option: ", "success"))
 
             if choice == "0":
                 break
@@ -541,7 +541,7 @@ def service_control():
             print("\n[0]  Return to Service Control Menu")
 
             # Input
-            choice = input("\n[?]  Select an option: ")
+            choice = input(colour("\n[?]  Select an option: ", "success"))
 
             if choice == "0":
                 break
@@ -580,7 +580,7 @@ def service_control():
             print("\n[0]  Return to Service Control Menu")
 
             # Input
-            choice = input("\n[?]  Select an option: ")
+            choice = input(colour("\n[?]  Select an option: ", "success"))
 
             if choice == "0":
                 break
@@ -607,10 +607,10 @@ def service_control():
         print("[1]  Change Interface State")
         print("[2]  Change Interface Mode")
         print("[3]  Reset Interface")
-        print("\n[0]  Return to Main Menu")
+        print(colour("\n[0]  Return to Main Menu", "warning"))
 
         # Input
-        choice = input("\n[?]  Select an option: ")
+        choice = input(colour("\n[?]  Select an option: ", "success"))
 
         if choice == "0":
             break
@@ -655,7 +655,7 @@ def main():
     """
     while True:
         show_menu()
-        choice = input("\n[?]  Select an option: ")
+        choice = input(colour("\n[?]  Select an option: ", "success"))
         
         if choice == "1":
             threat_scenario()
