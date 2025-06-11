@@ -9,7 +9,7 @@ SCENARIO_DIR="$BASH_DIR/scenarios"
 
 # ─── Configs ───
 source "$CONFIG_DIR/global.conf"
-source "$CONFIG_DIR/t007.conf"
+source "$CONFIG_DIR/t001.conf"
 
 # ─── Helpers ───
 source "$HELPERS_DIR/fn_print.sh"
@@ -39,22 +39,23 @@ wait_for_go() {
 }
 
 # ─── Scenario Introduction ───
-print_none "This scenario simulates a high-volume deauth flood intended to"
-print_none "forcibly disconnect clients from an AP."
+print_none "This scenario simulates a passive attacker listening for unencrypted"
+print_none "traffic on an open wireless network.  This allows observation of client"
+print_none "HTTP traffic, credentials, DNS queries, and other cleartext protocols."
 print_blank
 
 # ─── Access Point Instructions ───
 print_section "Scenario Pre-requisites"
-print_none "1. WPA2-PSK Access Point with associated client"
+print_none "1. Open Access Point"
 print_none "2. WSTT full/filtered capture"
 print_blank
 
 # ─── Launch Parameters ───
 print_section "Scenario Parameters"
-print_none "Scenario  : $T007_NAME ($T007_ID)"
-print_none "Interface : $INTERFACE"
-print_none "Tool      : $T007_TOOL"
-print_none "Mode      : $T007_MODE"
+print_none "Scenario   : $T001_NAME ($T001_ID)"
+print_none "Interface  : $INTERFACE"
+print_none "Tool       : $T001_TOOL"
+print_none "Mode       : $T001_MODE"
 print_blank
 
 # ─── User Confirmation ───
@@ -64,10 +65,11 @@ read -r READY
 print_blank
 
 # ─── WAPT Coordination ───
-print_section "Access Point Preparation"
-print_action "Launch a WPA2-PSK Access Point"
-print_none "BSSID     : $T007_BSSID"
-print_none "Channel   : $T007_CHANNEL"
+print_section "Access Point & Client Preparation"
+print_action "Launch an Open Access Point"
+print_none "SSID    : $T001_SSID"
+print_none "BSSID   : $T001_BSSID"
+print_none "Channel : $T001_CHANNEL"
 print_blank
 
 # ─── User Confirmation ───
@@ -75,47 +77,47 @@ if [[ "$ORCHESTRATION" == "1" ]]; then
     touch /tmp/watt_ready_ap
     wait_for_go "ap"
 else
-    user_confirmation "Confirm Access Point active" || exit 0
+    user_confirmation "Confirm Access Point launched" || exit 0
 fi
 
 # ─── WSTT Coordination ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full or filtered capture using WSTT"
-print_none "BSSID     : $T007_BSSID"
-print_none "Channel   : $T007_CHANNEL"
-print_none "Duration  : $T007_DURATION seconds"
+print_none "BSSID      : $T001_BSSID"
+print_none "Channel    : $T001_CHANNEL"
+print_none "Duration   : $T001_DURATION seconds"
 print_blank
 
-# ─── User Confirmation ───
+# ─── User / Orchestration Sync ───
 if [[ "$ORCHESTRATION" == "1" ]]; then
     touch /tmp/watt_ready_capture
     wait_for_go "capture"
 else
-    user_confirmation "Confirm Capturing" || exit 0
+    user_confirmation "Confirm capturing is active" || exit 0
 fi
 
 # ─── Signal Cleanup on Exit ───
 cleanup() {
-    rm -f /tmp/watt_ready_t007
+    rm -f /tmp/watt_ready_t001
+    rm -f /tmp/watt_ready_capture
 }
 trap cleanup EXIT
 
 # ─── Attack Execution ───
 print_section "Simulation Running"
 print_action "Launching simulation"
-print_waiting "Running $T007_NAME ($T007_ID)"
-touch /tmp/watt_ready_t007             # Ready marker
+print_waiting "Running $T001_NAME ($T001_ID)"
+touch /tmp/watt_ready_t001  # Ready marker
 if [[ "$ORCHESTRATION" == "1" ]]; then
-    bash "$SCENARIO_DIR/exec_t007.sh" --wait
+    bash "$SCENARIO_DIR/exec_t001.sh" --wait
 else
-    bash "$SCENARIO_DIR/exec_t007.sh"
+    bash "$SCENARIO_DIR/exec_t001.sh"
 fi
-print_success "Simulation complete"
 print_blank
 
 # ─── Post-Simulation Instructions ───
 print_section "Simulation Complete"
 print_action "Run WSTT detection scripts against the saved PCAP file"
-print_action "Review the capture in Wireshark (filter: $T007_FILTER_HINT)"
+print_action "Review the capture in Wireshark (filter: $T001_FILTER_HINT)"
 
 exit 0

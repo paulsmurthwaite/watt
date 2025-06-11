@@ -78,7 +78,7 @@ if [[ "$ORCHESTRATION" == "1" ]]; then
     touch /tmp/watt_ready_ap
     wait_for_go "ap"
 else
-    user_confirmation "Confirm Access Point" || exit 0
+    user_confirmation "Confirm Access Point active" || exit 0
 fi
 
 # ─── WSTT Coordination ───
