@@ -330,6 +330,9 @@ def threat_scenario():
     def threat_t002():
         run_bash_script("scenarios/run_t002", pause=True, capture=False, clear=True, title="Threat Scenario: Probe Request Snooping (T002)")
 
+    def threat_t003():
+        run_bash_script("scenarios/run_t003", pause=True, capture=False, clear=True, title="Threat Scenario: SSID Harvesting (T003)")
+
     def threat_t004():
         run_bash_script("scenarios/run_t004", pause=True, capture=False, clear=True, title="Threat Scenario: Evil Twin Attack (T004)")
 
@@ -360,15 +363,16 @@ def threat_scenario():
     actions = {
         "1":  threat_t001,
         "2":  threat_t002,
-        "3":  threat_t004,
-        "4":  threat_t005,
-        "5":  threat_t006,
-        "6":  threat_t008,
-        "7":  threat_t007,      
-        "8":  threat_t009,
-        "9":  threat_t014,
-        "10":  threat_t015,
-        "11":  threat_t016
+        "3":  threat_t003,
+        "4":  threat_t004,
+        "5":  threat_t005,
+        "6":  threat_t006,
+        "7":  threat_t008,
+        "8":  threat_t007,      
+        "9":  threat_t009,
+        "10":  threat_t014,
+        "11":  threat_t015,
+        "12":  threat_t016
     }
 
     while True:
@@ -381,18 +385,19 @@ def threat_scenario():
         ui_header("Access Point Threats")
         print("[1]  Run Unencrypted Traffic Capture scenario (T001)")
         print("[2]  Run Probe Request Snooping scenario (T002)")
-        print("[3]  Run Evil Twin Attack scenario (T004)")
-        print("[4]  Run Open Rogue AP scenario (T005)")
-        print("[5]  Run Misconfigured Access Point scenario (T006)")
-        print("[6]  Run Beacon Flood scenario (T008)")
+        print("[3]  Run SSID Harvesting scenario (T003)")
+        print("[4]  Run Evil Twin Attack scenario (T004)")
+        print("[5]  Run Open Rogue AP scenario (T005)")
+        print("[6]  Run Misconfigured Access Point scenario (T006)")
+        print("[7]  Run Beacon Flood scenario (T008)")
         print()
 
         ui_header("Client-side Threats")
-        print("[7]  Run Deauthentication Flood scenario (T007)")
-        print("[8]  Run Authentication Flood scenario (T009)")
-        print("[9]  Run ARP Spoofing from Wireless Entry Point scenario (T014)")
-        print("[10] Run Malicious Hotspot Auto-Connect scenario (T015)")
-        print("[11] Run Directed Probe Response scenario (T016)")
+        print("[8]  Run Deauthentication Flood scenario (T007)")
+        print("[9]  Run Authentication Flood scenario (T009)")
+        print("[10] Run ARP Spoofing from Wireless Entry Point scenario (T014)")
+        print("[11] Run Malicious Hotspot Auto-Connect scenario (T015)")
+        print("[12] Run Directed Probe Response scenario (T016)")
 
         print(colour("\n[0]  Return to Main Menu", "warning"))
 
