@@ -34,7 +34,7 @@ print_prompt() {
 }
 
 print_none() {
-    echo "$1"
+    echo -e "$1" | fold -s -w 80
 }
 
 print_blank() {
