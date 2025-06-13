@@ -1,9 +1,8 @@
 #!/bin/bash
-
 # ─── Internal Service Helpers for AP Profiles ───
-# This file is sourced by start-ap.sh and stop-ap.sh
+# Sourced by start-ap.sh and stop-ap.sh
 
-# ─── HTTP Server ───
+# ─── HTTP ───
 start_http_server() {
     print_action "Starting HTTP server on port 80"
     
@@ -57,7 +56,7 @@ stop_http_server() {
     print_success "Captive portal files removed"
 }
 
-# ─── DNS Server Wrapper ───
+# ─── DNS ───
 start_dns_service() {
     print_action "Configuring DNS"
     sudo systemctl stop systemd-resolved  # Local override
@@ -83,7 +82,7 @@ stop_dns_service() {
     sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 }
 
-# ─── NTP Server ───
+# ─── NTP ───
 start_ntp_service() {
     print_action "Starting local NTP server"
     sudo systemctl start ntp.service

@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # ─── Prompt user to proceed ───
 
 confirmation() {

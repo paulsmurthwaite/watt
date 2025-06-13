@@ -1,6 +1,7 @@
 #!/bin/bash
+# ─── Check Interface Mode ───
 
-# Check Monitor mode
+# ─── Monitor ───
 ensure_monitor_mode() {
 MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
 if [[ "$MODE" != "monitor" ]]; then
@@ -10,7 +11,7 @@ if [[ "$MODE" != "monitor" ]]; then
 fi
 }
 
-# Check Managed mode
+# ─── Managed ───
 ensure_managed_mode() {
 MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')
 if [[ "$MODE" != "managed" ]]; then

@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # ─── Standardise Output Formatting ───
 
 print_section() {
