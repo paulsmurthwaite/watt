@@ -21,7 +21,6 @@ ensure_monitor_mode
 print_blank
 print_info "Running T007 - Deauthentication Flood attack for $T007_DURATION seconds"
 sudo timeout "$T007_DURATION" mdk4 "$INTERFACE" d -B "$T007_BSSID" -c "$T007_CHANNEL"
-
 EXIT_CODE=$?
 
 ensure_managed_mode

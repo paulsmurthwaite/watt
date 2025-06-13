@@ -1,0 +1,90 @@
+#!/bin/bash
+# ─── T002 Probe Request Snooping ───
+
+# ─── Paths ───
+BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CONFIG_DIR="$BASH_DIR/config"
+HELPERS_DIR="$BASH_DIR/helpers"
+SCENARIO_DIR="$BASH_DIR/scenarios"
+SERVICES_DIR="$BASH_DIR/services"
+UTILITIES_DIR="$BASH_DIR/utilities"
+
+# ─── Configs ───
+source "$CONFIG_DIR/global.conf"
+source "$CONFIG_DIR/t002.conf"
+
+# ─── Helpers ───
+source "$HELPERS_DIR/fn_mode.sh"
+source "$HELPERS_DIR/fn_print.sh"
+source "$HELPERS_DIR/fn_prompt.sh"
+
+# ─── FN: Simulate Directed Probe Requests ───
+simulate_probe_requests() {
+    START_TIME=$(date +%s)
+
+    while true; do
+        CURRENT_TIME=$(date +%s)
+        ELAPSED=$((CURRENT_TIME - START_TIME))
+        if (( ELAPSED >= T002_DURATION )); then
+            break
+        fi
+
+        # ─── Probes ───
+        for SSID in "${T002_SSIDS[@]}"; do
+            print_action "Probing for SSID: $SSID"
+            nmcli device wifi connect "$SSID" ifname "$INTERFACE" >/dev/null 2>&1 || true
+            nmcli device disconnect "$INTERFACE" >/dev/null 2>&1
+            sleep "$T002_INTERVAL"
+        done
+    done
+}
+
+# ─── Show Simulation ───
+print_none "This simulation demonstrates the ability of a passive attacker to capture wireless"
+print_none "probe request frames transmitted by client devices.  These frames are sent when"
+print_none "clients actively search for known Wi-Fi networks (SSIDs), often revealing previous"
+print_none "connection history and preferred network names. The attacker listens silently on"
+print_none "the wireless channel to capture these requests."
+print_blank
+print_none "The information can be used to:"
+print_none "1. Profile a user's historical locations or home/office networks"
+print_none "2. Identify targets for directed attacks (e.g. Evil Twin or Directed Probe Response)"
+print_none "3. Correlate device behaviour with unique identifiers (e.g. MAC addresses)"
+print_blank
+
+# ─── Show Pre-reqs ───
+print_section "Scenario Pre-requisites"
+print_none "1. WSTT full/filtered capture"
+print_blank
+
+# ─── Show Params ───
+print_section "Simulation Parameters"
+print_none "Threat     : $T002_NAME ($T002_ID)"
+print_none "Interface  : $INTERFACE"
+print_none "Tool       : $T002_TOOL"
+print_none "Mode       : $T002_MODE"
+confirmation
+
+# ─── Show Capture ───
+print_section "WSTT Capture Preparation"
+print_action "Launch a full spectrum capture using WSTT"
+print_none "Duration   : $T002_DURATION seconds"
+confirmation
+
+# ─── Run Simulation ───
+print_section "Simulation Started"
+print_waiting "Running $T002_NAME ($T002_ID)"
+
+ensure_managed_mode
+simulate_probe_requests
+
+EXIT_CODE=$?
+print_blank
+
+if [[ "$EXIT_CODE" -ne 0 ]]; then
+    print_fail "Simulation stopped (Code: $EXIT_CODE)"
+else
+    print_success "Simulation completed"
+fi
+
+exit 0
