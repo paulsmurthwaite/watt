@@ -81,7 +81,7 @@ fi
 
 # ─── Generate Traffic ───
 print_info "Running $SCN_ID - $SCN_NAME simulation for $SCN_DURATION seconds"
-sudo timeout "$SCN_DURATION" bash "$HELPERS_DIR/fn_traffic.sh t001"
+sudo timeout "$SCN_DURATION" bash "$HELPERS_DIR/fn_traffic.sh" t001
 print_blank
 EXIT_CODE=$?
 

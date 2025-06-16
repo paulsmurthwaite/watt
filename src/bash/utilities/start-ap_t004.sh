@@ -20,7 +20,7 @@ source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_services.sh"
 
 # ─── Export for envsubst and BSSID support ───
-export INTERFACE SSID CHANNEL HIDDEN WPA_MODE PASSPHRASE WPA3 BSSID
+export INTERFACE SSID CHANNEL HIDDEN WPA_MODE PASSPHRASE BSSID
 
 # ─── Generate hostapd.conf ───
 if [[ -z "$WPA_MODE" ]]; then
@@ -34,15 +34,6 @@ else
     envsubst < "$CONFIG_DIR/hostapd.conf.template" > /tmp/hostapd.conf
 fi
 
-# ─── WPA3 ───
-if [[ "$WPA3" == "1" ]]; then
-    {
-        echo "ieee80211w=2"
-        echo "sae_require_mfp=1"
-        echo "wpa_key_mgmt=SAE WPA-PSK"
-    } >> /tmp/hostapd.conf
-fi
-
 ensure_managed_mode
 
 # ─── NetworkManager ───
@@ -52,10 +43,10 @@ sudo systemctl stop NetworkManager
 print_waiting "Configuring interface $INTERFACE"
 
 bash "$SERVICES_DIR/set-interface-down.sh"  # IF Down
-print_action "Spoofing interface MAC to match BSSID: $T004_BSSID"
-sudo ip link set "$INTERFACE" address "$T004_BSSID"
+print_action "Spoofing interface MAC to match BSSID: $SCN_BSSID"
+sudo ip link set "$INTERFACE" address "$SCN_BSSID"
 
-sudo ip addr add "${GATEWAY}/24" dev "$INTERFACE"
+sudo ip addr add "${SCN_GATEWAY}/24" dev "$INTERFACE"
 bash "$SERVICES_DIR/set-interface-up.sh"  # IF Up
 
 print_success "Interface $INTERFACE configured"
@@ -68,9 +59,9 @@ sudo hostapd /tmp/hostapd.conf -B
 
 # ─── NAT ───
 print_action "Starting NAT: Client Internet access ENABLED"
-sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o "$FWD_INTERFACE" -j MASQUERADE
-sudo iptables -A FORWARD -i "$INTERFACE" -o "$FWD_INTERFACE" -j ACCEPT
-sudo iptables -A FORWARD -i "$FWD_INTERFACE" -o "$INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o "$SCN_FWD_INTERFACE" -j MASQUERADE
+sudo iptables -A FORWARD -i "$INTERFACE" -o "$SCN_FWD_INTERFACE" -j ACCEPT
+sudo iptables -A FORWARD -i "$SCN_FWD_INTERFACE" -o "$INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 # ─── Services ───
 start_dns_service
@@ -78,4 +69,4 @@ start_ntp_service
 start_http_server
 
 # ─── AP status flag ───
-echo "$SSID|$(date +%s)|nat" > /tmp/wapt_ap_active
+echo "$SCN_SSID|$(date +%s)|nat" > /tmp/ap_active

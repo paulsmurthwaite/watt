@@ -16,7 +16,7 @@ source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_services.sh"
 
 # ─── AP status flag ───
-rm -f /tmp/wapt_ap_active
+rm -f /tmp/ap_active
 
 # ─── Services ───
 stop_http_server
