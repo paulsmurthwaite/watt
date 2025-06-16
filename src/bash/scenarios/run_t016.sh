@@ -39,10 +39,7 @@ wait_for_go() {
 }
 
 # ─── Scenario Introduction ───
-print_none "This scenario simulates a spoofed access point responding to directed"
-print_none "probe requests from client devices.  This emulates the behaviour of"
-print_none "known Wi-Fi networks being impersonated, aiming to trick clients into"
-print_none "initiating an auto-connect sequence."
+print_none "This scenario simulates a spoofed access point responding to directed probe requests from client devices.  This emulates the behaviour of known Wi-Fi networks being impersonated, aiming to trick clients into initiating an auto-connect sequence."
 print_blank
 
 # ─── Access Point Instructions ───

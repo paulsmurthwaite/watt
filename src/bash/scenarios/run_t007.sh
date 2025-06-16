@@ -39,8 +39,7 @@ wait_for_go() {
 }
 
 # ─── Scenario Introduction ───
-print_none "This scenario simulates a high-volume deauth flood intended to"
-print_none "forcibly disconnect clients from an AP."
+print_none "This scenario simulates a high-volume deauth flood intended to forcibly disconnect clients from an AP."
 print_blank
 
 # ─── Access Point Instructions ───

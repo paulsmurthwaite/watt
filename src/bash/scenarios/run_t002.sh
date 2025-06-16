@@ -40,16 +40,13 @@ simulate_probe_requests() {
 }
 
 # ─── Show Simulation ───
-print_none "This simulation demonstrates the ability of a passive attacker to capture wireless"
-print_none "probe request frames transmitted by client devices.  These frames are sent when"
-print_none "clients actively search for known Wi-Fi networks (SSIDs), often revealing previous"
-print_none "connection history and preferred network names. The attacker listens silently on"
-print_none "the wireless channel to capture these requests."
-print_blank
-print_none "The information can be used to:"
-print_none "1. Profile a user's historical locations or home/office networks"
-print_none "2. Identify targets for directed attacks (e.g. Evil Twin or Directed Probe Response)"
-print_none "3. Correlate device behaviour with unique identifiers (e.g. MAC addresses)"
+print_none "Objective: This scenario demonstrates the ability of a passive attacker to capture wireless probe request frames transmitted by client devices.  These frames are sent when clients actively search for known Wi-Fi networks (SSIDs), often revealing previous connection history and preferred network names.
+
+The attacker listens silently on the wireless channel to capture these requests.  This can be used to:
+
+- profile a user's historical locations or home/office networks
+- identify targets for directed attacks (e.g. Evil Twin or Directed Probe Response)
+- correlate device behaviour with unique identifiers (e.g. MAC addresses)"
 print_blank
 
 # ─── Show Pre-reqs ───

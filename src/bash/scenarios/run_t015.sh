@@ -39,10 +39,7 @@ wait_for_go() {
 }
 
 # ─── Scenario Introduction ───
-print_none "This scenario simulates a rogue open access point that broadcasts a"
-print_none "known SSID in order to trick client devices into automatically connecting."
-print_none "This takes advantage of auto-connect behaviour for open networks stored"
-print_none "in the client's known networks list."
+print_none "This scenario simulates a rogue open access point that broadcasts a known SSID in order to trick client devices into automatically connecting.  This takes advantage of auto-connect behaviour for open networks stored in the client's known networks list."
 print_blank
 
 # ─── Access Point Instructions ───

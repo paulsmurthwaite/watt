@@ -39,9 +39,7 @@ wait_for_go() {
 }
 
 # ─── Scenario Introduction ───
-print_none "This scenario simulates a Beacon Flood attack."
-print_none "Fake access points are broadcast at high volume to flood"
-print_none "the wireless spectrum with phantom SSIDs."
+print_none "This scenario simulates a Beacon Flood attack.  Fake access points are broadcast at high volume to flood the wireless spectrum with phantom SSIDs."
 print_blank
 
 # ─── Access Point Instructions ───

@@ -39,10 +39,7 @@ wait_for_go() {
 }
 
 # ─── Scenario Introduction ───
-print_none "This scenario simulates a man-in-the-middle (MiTM) attack via ARP"
-print_none "spoofing, launched from a rogue wireless entry point.  It targets"
-print_none "a client and gateway to hijack traffic, enabling packet interception"
-print_none "or manipulation."
+print_none "This scenario simulates a man-in-the-middle (MiTM) attack via ARP spoofing, launched from a rogue wireless entry point.  It targets a client and gateway to hijack traffic, enabling packet interception or manipulation."
 print_blank
 
 # ─── Access Point Instructions ───

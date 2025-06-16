@@ -39,10 +39,7 @@ wait_for_go() {
 }
 
 # ─── Scenario Introduction ───
-print_none "This scenario simulates a denial of service condition by sending"
-print_none "a rapid stream of fake authentication requests to a target"
-print_none "access point.  This can overload the AP's association table or"
-print_none "CPU resources, disrupting service for legitimate clients."
+print_none "This scenario simulates a denial of service condition by sending a rapid stream of fake authentication requests to a target access point.  This can overload the AP's association table or CPU resources, disrupting service for legitimate clients."
 print_blank
 
 # ─── Access Point Instructions ───

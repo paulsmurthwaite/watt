@@ -39,9 +39,7 @@ wait_for_go() {
 }
 
 # ─── Scenario Introduction ───
-print_none "This scenario simulates a passive attacker listening for unencrypted"
-print_none "traffic on an open wireless network.  This allows observation of client"
-print_none "HTTP traffic, credentials, DNS queries, and other cleartext protocols."
+print_none "Objective: Simulates a passive attacker listening for unencrypted traffic on an open wireless network.  This allows observation of client HTTP traffic, credentials, DNS queries, and other cleartext protocols."
 print_blank
 
 # ─── Access Point Instructions ───
