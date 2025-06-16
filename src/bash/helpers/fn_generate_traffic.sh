@@ -50,12 +50,12 @@ while true; do
     print_blank
     print_action "Generating HTTP GET requests to Captive Portal"
     print_info "GET /"
-    curl -s -o /dev/null -w "Status: %{http_code}\n" http://$SCN_GATEWAY
-    curl -s http://$SCN_GATEWAY | head -n 5
+    curl -s -o /dev/null -w "Status: %{http_code}\n" "http://$SCN_GATEWAY"
+    curl -s "http://$SCN_GATEWAY" | head -n 5
 
     print_info "GET /index.html"
-    curl -s -o /dev/null -w "Status: %{http_code}\n" http://$SCN_GATEWAY/index.html
-    curl -s http://$SCN_GATEWAY/index.html | head -n 5
+    curl -s -o /dev/null -w "Status: %{http_code}\n" "http://$SCN_GATEWAY/index.html"
+    curl -s "http://$SCN_GATEWAY/index.html" | head -n 5
 
     # ─── DNS Queries ───
     print_blank
@@ -71,7 +71,7 @@ while true; do
     # ─── Simulated Credential Submission ───
     print_action "Submitting fake credentials to HTTP login page"
     curl -s -o /dev/null -w "POST /submit → HTTP %{http_code}\n" \
-        -X POST -d "username=admin&password=admin" http://$SCN_GATEWAY/submit
+        -X POST -d "username=admin&password=admin" "http://$SCN_GATEWAY/submit"
 
     # ─── ICMP Ping ───
     print_blank
