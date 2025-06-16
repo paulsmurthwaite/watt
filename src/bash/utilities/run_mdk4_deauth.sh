@@ -35,7 +35,9 @@ SERVICES_DIR="$BASH_DIR/services"
 
 # ─── Configs ───
 source "$CONFIG_DIR/global.conf"
-source "$CONFIG_DIR/atk_mdk4_deauth.conf"
+ATK_DURATION=60
+ATK_BSSID="02:00:00:00:00:02"
+ATK_CHANNEL="6"
 
 # ─── Helpers ───
 source "$HELPERS_DIR/fn_print.sh"

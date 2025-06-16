@@ -34,7 +34,9 @@ SERVICES_DIR="$BASH_DIR/services"
 
 # ─── Configs ───
 source "$CONFIG_DIR/global.conf"
-source "$CONFIG_DIR/atk_mdk4_auth.conf"
+ATK_DURATION=60
+ATK_AUTH_PPS=150  # Packets per second
+ATK_BSSID="02:00:00:00:00:02"
 
 # ─── Helpers ───
 source "$HELPERS_DIR/fn_print.sh"

@@ -39,7 +39,10 @@ SERVICES_DIR="$BASH_DIR/services"
 
 # ─── Configs ───
 source "$CONFIG_DIR/global.conf"
-source "$CONFIG_DIR/atk_airbase_probe.conf"
+ATK_DURATION=60
+ATK_PROBE_SSID="WSTTCorpWiFi"
+ATK_PROBE_BSSID="02:00:00:00:00:04"
+ATK_CHANNEL="6"
 
 # ─── Helpers ───
 source "$HELPERS_DIR/fn_print.sh"

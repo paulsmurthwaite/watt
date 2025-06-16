@@ -37,7 +37,9 @@ SERVICES_DIR="$BASH_DIR/services"
 
 # ─── Configs ───
 source "$CONFIG_DIR/global.conf"
-source "$CONFIG_DIR/atk_mdk4_beacon.conf"
+ATK_DURATION=60
+ATK_INTERVAL=100
+ATK_SSID_FILE=ssids.txt
 
 # ─── Helpers ───
 source "$HELPERS_DIR/fn_print.sh"
