@@ -1,7 +1,4 @@
 #!/bin/bash
-# Utility: Stops any running access point launched from WAPT
-# Usage: # ./stop-ap.sh
-
 set -e
 
 # ─── Paths ───

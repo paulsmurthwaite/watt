@@ -43,6 +43,7 @@ print_section "WSTT Capture Preparation"
 print_action "Launch a full/filtered capture using WSTT"
 print_none "Duration        : $T003_DURATION seconds"
 print_none "Capture Channel : $T003_CHANNEL"
+
 confirmation
 
 # ─── Run Simulation ───

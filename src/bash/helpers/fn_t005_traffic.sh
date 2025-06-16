@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ─── Simulated Unencrypted Traffic Generator for T005 ───
-# This script is executed by exec_t005.sh on WATT
+# This script is called from run_t005.sh
 
 # ─── Paths ───
 BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

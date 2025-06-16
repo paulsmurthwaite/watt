@@ -4,8 +4,8 @@
 BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIG_DIR="$BASH_DIR/config"
 HELPERS_DIR="$BASH_DIR/helpers"
-SERVICES_DIR="$BASH_DIR/services"
 SCENARIO_DIR="$BASH_DIR/scenarios"
+SERVICES_DIR="$BASH_DIR/services"
 UTILITIES_DIR="$BASH_DIR/utilities"
 
 # ─── Configs ───
@@ -13,14 +13,13 @@ source "$CONFIG_DIR/global.conf"
 source "$CONFIG_DIR/t005.conf"
 
 # ─── Helpers ───
-source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_mode.sh"
+source "$HELPERS_DIR/fn_print.sh"
 
 # ─── Start AP ───
 print_section "Simulation Started"
-print_info "Launching Access Point"
 
-bash "$UTILITIES_DIR/start-ap_t005.sh" ap_rogue_t005 nat
+bash "$UTILITIES_DIR/start-ap_t005.sh" ap_t005 nat
 START_EXIT_CODE=$?
 
 if [[ "$START_EXIT_CODE" -ne 0 ]]; then
