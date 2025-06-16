@@ -52,6 +52,7 @@ print_section "WSTT Capture Preparation"
 print_action "Launch a full/filtered capture using WSTT"
 print_none "Duration        : $SCN_DURATION seconds"
 print_none "Capture Channel : $SCN_CHANNEL"
+
 confirmation
 
 # ─── Run Simulation ───
@@ -77,7 +78,7 @@ fi
 # ─── Stop AP ───
 print_info "Stopping Access Point"
 
-bash "$UTILITIES_DIR/stop-ap.sh"
+bash "$HELPERS_DIR/fn_stop-ap.sh"
 STOP_EXIT_CODE=$?
 
 print_blank

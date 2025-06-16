@@ -56,10 +56,10 @@ sudo systemctl stop NetworkManager
 print_waiting "Configuring interface $INTERFACE"
 
 bash "$SERVICES_DIR/set-interface-down.sh"
-print_action "Spoofing interface MAC to match BSSID: $T005_BSSID"
-sudo ip link set "$INTERFACE" address "$T005_BSSID"
+print_action "Spoofing interface MAC to match BSSID: $SCN_BSSID"
+sudo ip link set "$INTERFACE" address "$SCN_BSSID"
 
-sudo ip addr add "${GATEWAY}/24" dev "$INTERFACE"
+sudo ip addr add "${SCN_GATEWAY}/24" dev "$INTERFACE"
 bash "$SERVICES_DIR/set-interface-up.sh"
 
 print_success "Interface $INTERFACE configured"
@@ -75,13 +75,13 @@ if ! pgrep hostapd > /dev/null; then
 fi
 
 # ─── AP status flag ───
-echo "$SSID|$(date +%s)|nat" > /tmp/ap_active
+echo "$SCN_SSID|$(date +%s)|nat" > /tmp/ap_active
 
 # ─── NAT ───
 print_action "Starting NAT: Client Internet access ENABLED"
-sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o "$FWD_INTERFACE" -j MASQUERADE
-sudo iptables -A FORWARD -i "$INTERFACE" -o "$FWD_INTERFACE" -j ACCEPT
-sudo iptables -A FORWARD -i "$FWD_INTERFACE" -o "$INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -o "$SCN_FWD_INTERFACE" -j MASQUERADE
+sudo iptables -A FORWARD -i "$INTERFACE" -o "$SCN_FWD_INTERFACE" -j ACCEPT
+sudo iptables -A FORWARD -i "$SCN_FWD_INTERFACE" -o "$INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 # ─── Services ───
 start_dns_service

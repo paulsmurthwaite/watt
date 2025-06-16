@@ -1,5 +1,4 @@
 #!/bin/bash
-# ─── T003 Open Rogue AP ───
 
 # ─── Paths ───
 BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -13,7 +12,7 @@ UTILITIES_DIR="$BASH_DIR/utilities"
 source "$CONFIG_DIR/global.conf"
 source "$CONFIG_DIR/t005.conf"
 
-# ─── Helpers ───
+# ─── Dependencies ───
 source "$HELPERS_DIR/fn_mode.sh"
 source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_prompt.sh"
@@ -33,35 +32,35 @@ print_blank
 
 # ─── Show Params ───
 print_section "Simulation Parameters"
-print_none "Threat          : $T005_NAME ($T005_ID)"
+print_none "Threat          : $SCN_NAME ($SCN_ID)"
 print_none "Interface       : $INTERFACE"
-print_none "Tool            : $T005_TOOL"
-print_none "Mode            : $T005_MODE"
+print_none "Tool            : $SCN_TOOL"
+print_none "Mode            : $SCN_MODE"
 
 confirmation
 
 # ─── Show AP/Client config ───
 print_section "Access Point & Client Preparation"
-print_none "1. Launch AP profile $T005_WAPT on WAPT"
-print_none "2. Prepare a client device to join the Rogue AP SSID: $T005_ROGUE_SSID"
+print_none "1. Launch AP profile $SCN_PROFILE on WAPT"
+print_none "2. Prepare a client device to join the Rogue AP SSID: $SCN_ROGUE_SSID"
 
 confirmation
 
 # ─── Show Capture ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full/filtered capture using WSTT"
-print_none "Duration        : $T005_DURATION seconds"
-print_none "Capture Channel : $T005_CHANNEL"
+print_none "Duration        : $SCN_DURATION seconds"
+print_none "Capture Channel : $SCN_CHANNEL"
 
 confirmation
 
 # ─── Run Simulation ───
-ensure_managed_mode
-
 clear
 print_section "Simulation Running"
 
 # ─── Start AP ───
+print_info "Launching Access Point"
+
 bash "$UTILITIES_DIR/start-ap_t005.sh" ap_t005 nat
 START_EXIT_CODE=$?
 
@@ -70,24 +69,23 @@ if [[ "$START_EXIT_CODE" -ne 0 ]]; then
     exit "$START_EXIT_CODE"
 else
     print_success "Access Point launch successful"
-    print_info "Generating Traffic"  # Generate network traffic
-    sudo timeout "$T005_DURATION" bash $HELPERS_DIR/fn_t005_traffic.sh
+    print_info "Generating Traffic"
+    sudo timeout "$SCN_DURATION" bash "$HELPERS_DIR/fn_traffic.sh" t005
+    print_blank
 fi
 
 # ─── Stop AP ───
-print_blank
-print_section "Simulation Complete"
 print_info "Stopping Access Point"
 
-bash "$UTILITIES_DIR/stop-ap.sh"
+bash "$HELPERS_DIR/fn_stop-ap.sh"
 STOP_EXIT_CODE=$?
+
 print_blank
 
-if [[ "$STOP_EXIT_CODE" -ne 0 ]]; then
-    print_fail "Access Point shutdown failed (Exit Code: $STOP_EXIT_CODE)"
-    exit "$STOP_EXIT_CODE" 
+if (( STOP_EXIT_CODE == 0 )); then
+    print_success "Simulation completed"
+else
+    print_fail "Simulation stopped (Code: $STOP_EXIT_CODE)"
 fi
-
-print_success "Simulation completed"
 
 exit 0

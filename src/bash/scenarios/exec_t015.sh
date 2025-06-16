@@ -34,7 +34,7 @@ fi
 
 # ─── Stop AP ───
 print_info "Stopping access point"
-bash "$UTILITIES_DIR/stop-ap.sh"
+bash "$HELPERS_DIR/fn_stop-ap.sh"
 print_success "Spoofed AP stopped"
 
 EXIT_CODE=$?
