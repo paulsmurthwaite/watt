@@ -4,118 +4,99 @@
 BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIG_DIR="$BASH_DIR/config"
 HELPERS_DIR="$BASH_DIR/helpers"
-SERVICES_DIR="$BASH_DIR/services"
 SCENARIO_DIR="$BASH_DIR/scenarios"
+SERVICES_DIR="$BASH_DIR/services"
+UTILITIES_DIR="$BASH_DIR/utilities"
 
 # ─── Configs ───
 source "$CONFIG_DIR/global.conf"
 source "$CONFIG_DIR/t001.conf"
 
-# ─── Helpers ───
+# ─── Dependencies ───
+source "$HELPERS_DIR/fn_mode.sh"
 source "$HELPERS_DIR/fn_print.sh"
+source "$HELPERS_DIR/fn_prompt.sh"
 
-# Prompt user to proceed
-user_confirmation() {
-    if [[ "$ORCHESTRATION" == "1" ]]; then
-        print_info "Orchestration task"
-        print_blank
-        return 0
-    fi
-    print_prompt "$1 [y/N]: "
-    read -r READY
-    [[ "$READY" != "y" && "$READY" != "Y" ]] && return 1
-    print_blank
-    return 0
-}
-
-# Orchestration wait for go
-wait_for_go() {
-    local GO_FILE="/tmp/watt_go_$1"
-    print_info "Waiting for go signal: $GO_FILE"
-    while [ ! -f "$GO_FILE" ]; do
-        sleep 1
-    done
-    rm -f "$GO_FILE"
-}
-
-# ─── Scenario Introduction ───
+# ─── Show Introduction ───
 print_none "Objective: Simulates a passive attacker listening for unencrypted traffic on an open wireless network.  This allows observation of client HTTP traffic, credentials, DNS queries, and other cleartext protocols."
-print_blank
 
-# ─── Access Point Instructions ───
+confirmation
+
+# ─── Show Pre-reqs ───
 print_section "Scenario Pre-requisites"
-print_none "1. Open Access Point"
+print_none "1. WAPT Profile: $SCN_PROFILE"
 print_none "2. WSTT full/filtered capture"
 print_blank
 
-# ─── Launch Parameters ───
+# ─── Show Parameters ───
 print_section "Scenario Parameters"
-print_none "Scenario   : $T001_NAME ($T001_ID)"
+print_none "Scenario   : $SCN_NAME ($SCN_ID)"
 print_none "Interface  : $INTERFACE"
-print_none "Tool       : $T001_TOOL"
-print_none "Mode       : $T001_MODE"
-print_blank
+print_none "Tool       : $SCN_TOOL"
+print_none "Mode       : $SCN_MODE"
 
-# ─── User Confirmation ───
-print_prompt "Proceed [y/N]: "
-read -r READY
-[[ "$READY" != "y" && "$READY" != "Y" ]] && exit 0
-print_blank
+confirmation
 
-# ─── WAPT Coordination ───
-print_section "Access Point & Client Preparation"
-print_action "Launch an Open Access Point"
-print_none "SSID    : $T001_SSID"
-print_none "BSSID   : $T001_BSSID"
-print_none "Channel : $T001_CHANNEL"
-print_blank
+# ─── Show AP Config ───
+print_section "Access Point / Client Preparation"
+print_action "Launch Access Point"
+print_none "Profile    : $SCN_PROFILE"
+print_none "SSID       : $SCN_SSID"
+print_none "BSSID      : $SCN_BSSID"
+print_none "Channel    : $SCN_CHANNEL"
 
-# ─── User Confirmation ───
-if [[ "$ORCHESTRATION" == "1" ]]; then
-    touch /tmp/watt_ready_ap
-    wait_for_go "ap"
-else
-    user_confirmation "Confirm Access Point launched" || exit 0
-fi
+confirmation
 
-# ─── WSTT Coordination ───
+# ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full or filtered capture using WSTT"
-print_none "BSSID      : $T001_BSSID"
-print_none "Channel    : $T001_CHANNEL"
-print_none "Duration   : $T001_DURATION seconds"
-print_blank
+print_none "BSSID      : $SCN_BSSID"
+print_none "Channel    : $SCN_CHANNEL"
+print_none "Duration   : $SCN_DURATION seconds"
 
-# ─── User / Orchestration Sync ───
-if [[ "$ORCHESTRATION" == "1" ]]; then
-    touch /tmp/watt_ready_capture
-    wait_for_go "capture"
-else
-    user_confirmation "Confirm capturing is active" || exit 0
-fi
+confirmation
 
-# ─── Signal Cleanup on Exit ───
-cleanup() {
-    rm -f /tmp/watt_ready_t001
-    rm -f /tmp/watt_ready_capture
-}
-trap cleanup EXIT
-
-# ─── Attack Execution ───
+# ─── Run Simulation ───
+clear
 print_section "Simulation Running"
-print_action "Launching simulation"
-print_waiting "Running $T001_NAME ($T001_ID)"
-touch /tmp/watt_ready_t001  # Ready marker
-if [[ "$ORCHESTRATION" == "1" ]]; then
-    bash "$SCENARIO_DIR/exec_t001.sh" --wait
-else
-    bash "$SCENARIO_DIR/exec_t001.sh"
-fi
+
+# ─── Associate with AP ───
+print_action "Associating with AP SSID: $SCN_SSID"
+ensure_managed_mode
+nmcli device wifi connect "$SCN_SSID" ifname "$INTERFACE"
+print_success "Associated with AP SSID: $SCN_SSID"
 print_blank
 
-# ─── Post-Simulation Instructions ───
-print_section "Simulation Complete"
-print_action "Run WSTT detection scripts against the saved PCAP file"
-print_action "Review the capture in Wireshark (filter: $T001_FILTER_HINT)"
+# ─── Check for IP assignment ───
+print_info "Waiting for DHCP lease"
+sleep 3
+IP_ADDR=$(ip -4 addr show "$INTERFACE" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+if [[ -n "$IP_ADDR" ]]; then
+    print_success "DHCP assigned IP: $IP_ADDR"
+    print_blank
+else
+    print_fail "No IP address assigned to $INTERFACE"
+    exit 1
+fi
+
+# ─── Generate Traffic ───
+print_info "Running $SCN_ID - $SCN_NAME simulation for $SCN_DURATION seconds"
+sudo timeout "$SCN_DURATION" bash $HELPERS_DIR/fn_generate_traffic.sh t001
+print_blank
+EXIT_CODE=$?
+
+# ─── Disassociate from AP ───
+print_action "Disassociating from AP SSID: $SCN_SSID"
+nmcli device disconnect "$INTERFACE"
+print_success "Disassociated from AP SSID: $SCN_SSID"
+ensure_managed_mode
+
+print_blank
+
+if (( EXIT_CODE == 0 )); then
+    print_success "Simulation completed"
+else
+    print_fail "Simulation stopped (Code: $EXIT_CODE)"
+fi
 
 exit 0

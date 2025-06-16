@@ -1,19 +1,39 @@
 #!/bin/bash
 
-# ─── Simulated Unencrypted Traffic Generator for T001 ───
-# This script is executed by exec_t001.sh on WATT
+# ─── Input Argument ───
+THREAT_ID="$1"
+if [[ -z "$THREAT_ID" ]]; then
+    echo "[x] No scenario ID provided. Usage: $0 <TXXX>"
+    exit 1
+fi
 
 # ─── Paths ───
 BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIG_DIR="$BASH_DIR/config"
 HELPERS_DIR="$BASH_DIR/helpers"
+SCENARIO_DIR="$BASH_DIR/scenarios"
+SERVICES_DIR="$BASH_DIR/services"
+UTILITIES_DIR="$BASH_DIR/utilities"
+CONF_FILE="$CONFIG_DIR/${THREAT_ID,,}.conf"
 
 # ─── Configs ───
 source "$CONFIG_DIR/global.conf"
-source "$CONFIG_DIR/t001.conf"
 
-# ─── Helpers ───
+# ─── Dependencies ───
 source "$HELPERS_DIR/fn_print.sh"
+
+# ─── Validation ───
+if [[ ! -f "$CONF_FILE" ]]; then
+    print_fail "Configuration file not found: $CONF_FILE"
+    exit 1
+fi
+
+source "$CONF_FILE"
+
+if [[ -z "$SCN_GATEWAY" ]]; then
+    print_fail "SCN_GATEWAY variable not set in $CONF_FILE"
+    exit 1
+fi
 
 # ─── Timing ───
 START_TIME=$(date +%s)
@@ -22,7 +42,7 @@ START_TIME=$(date +%s)
 while true; do
     CURRENT_TIME=$(date +%s)
     ELAPSED=$((CURRENT_TIME - START_TIME))
-    if (( ELAPSED >= T001_DURATION )); then
+    if (( ELAPSED >= SCN_DURATION )); then
         break
     fi
 
@@ -30,41 +50,42 @@ while true; do
     print_blank
     print_action "Generating HTTP GET requests to Captive Portal"
     print_info "GET /"
-    curl -s -o /dev/null -w "Status: %{http_code}\n" http://10.0.0.1
-    curl -s http://10.0.0.1 | head -n 5
+    curl -s -o /dev/null -w "Status: %{http_code}\n" http://$SCN_GATEWAY
+    curl -s http://$SCN_GATEWAY | head -n 5
 
     print_info "GET /index.html"
-    curl -s -o /dev/null -w "Status: %{http_code}\n" http://10.0.0.1/index.html
-    curl -s http://10.0.0.1/index.html | head -n 5
+    curl -s -o /dev/null -w "Status: %{http_code}\n" http://$SCN_GATEWAY/index.html
+    curl -s http://$SCN_GATEWAY/index.html | head -n 5
 
     # ─── DNS Queries ───
     print_blank
     print_action "Simulating DNS queries to local resolver"
     for domain in wstt.test watt.test wapt.test; do
         print_info "Resolving: $domain"
-        dig +short @$T001_GATEWAY "$domain"
+        dig +short @"$SCN_GATEWAY" "$domain"
     done
 
     print_info "Resolving: captive.portal"
-    nslookup captive.portal "$T001_GATEWAY"
+    nslookup captive.portal "$SCN_GATEWAY"
 
     # ─── Simulated Credential Submission ───
     print_action "Submitting fake credentials to HTTP login page"
     curl -s -o /dev/null -w "POST /submit → HTTP %{http_code}\n" \
-        -X POST -d "username=admin&password=admin" http://10.0.0.1/submit
+        -X POST -d "username=admin&password=admin" http://$SCN_GATEWAY/submit
 
     # ─── ICMP Ping ───
     print_blank
     print_action "Sending ICMP ping to AP gateway"
-    ping -c 3 10.0.0.1 | grep -E 'bytes from|packets transmitted'
+    ping -c 3 "$SCN_GATEWAY" | grep -E 'bytes from|packets transmitted'
 
     # ─── NTP Request ───
     print_blank
     print_action "Sending NTP request to local NTP server"
-    ntpdate -u 10.0.0.1 | grep -E 'adjust time server|no server suitable'
+    ntpdate -u "$SCN_GATEWAY" | grep -E 'adjust time server|no server suitable'
 
     print_blank
-    sleep "$T001_INTERVAL"
+    sleep "$SCN_INTERVAL"
+    clear
 done
 
 exit 0
