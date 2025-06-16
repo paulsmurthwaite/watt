@@ -18,7 +18,6 @@ source "$HELPERS_DIR/fn_mode.sh"
 
 # ─── Start AP ───
 print_section "Simulation Started"
-print_blank
 print_info "Launching Access Point"
 
 bash "$UTILITIES_DIR/start-ap_t005.sh" ap_rogue_t005 nat
@@ -36,7 +35,6 @@ fi
 # ─── Stop AP ───
 print_blank
 print_section "Simulation Complete"
-print_blank
 print_info "Stopping Access Point"
 
 bash "$UTILITIES_DIR/stop-ap.sh"
@@ -46,5 +44,7 @@ if [[ "$STOP_EXIT_CODE" -ne 0 ]]; then
     print_fail "Access Point shutdown failed (Exit Code: $STOP_EXIT_CODE)"
     exit "$STOP_EXIT_CODE" 
 fi
+
+print_success "Simulation completed"
 
 exit 0
