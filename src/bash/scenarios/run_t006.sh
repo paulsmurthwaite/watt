@@ -17,40 +17,49 @@ source "$HELPERS_DIR/fn_mode.sh"
 source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_prompt.sh"
 
-# ─── Show Introduction ───
-print_none "This scenario simulates a wireless access point that has been incorrectly configured by an administrator, leading to weakened security or unintended client exposure.  Misconfigurations can include disabled encryption, fallback to legacy protocols (e.g. WEP), or open SSIDs within a protected environment.
+# ─── Show Scenario ───
+print_none "Threat:        $SCN_NAME"
+print_none "Tool:          $SCN_TOOL"
+print_none "Mode:          $SCN_MODE"
+print_blank
+print_wrapped_indent "Objective: " \
+"This scenario simulates a wireless access point that has been incorrectly configured by an administrator, leading to weakened security or unintended client exposure.  Misconfigurations can include disabled encryption, fallback to legacy protocols (e.g. WEP), or open SSIDs within a protected environment.
 
 The goal is to demonstrate how such misconfigurations may unintentionally expose sensitive client traffic to attackers monitoring the wireless medium."
+print_line
 
 confirmation
 
-# ─── Show Pre-reqs ───
-print_section "Scenario Pre-requisites"
-print_none "1. WSTT full/filtered capture"
+# ─── Show Requirements ───
+print_section "Requirements"
+print_none "1. AP Profile: $SCN_PROFILE"
 print_blank
 
-# ─── Show Parameters ───
-print_section "Simulation Parameters"
-print_none "Threat          : $SCN_NAME ($SCN_ID)"
-print_none "Interface       : $INTERFACE"
-print_none "Tool            : $SCN_TOOL"
-print_none "Mode            : $SCN_MODE"
+# ─── Show AP Config ───
+print_section "Access Point Preparation"
+print_none "AP Profile:    $SCN_PROFILE"
+print_none "SSID:          $SCN_SSID"
+print_none "BSSID:         $SCN_BSSID"
+print_none "Channel:       $SCN_CHANNEL"
+print_blank
+print_action "Launch Access Point"
 
 confirmation
 
 # ─── Show Capture Config ───
-print_section "WSTT Capture Preparation"
-print_action "Launch a full or filtered capture using WSTT"
-print_none "Duration        : $SCN_DURATION seconds"
-print_none "Capture Channel : $SCN_CHANNEL"
+print_section "Capture Preparation"
+print_none "Type:          $SCN_CAPTURE"
+print_none "BSSID:         $SCN_BSSID"
+print_none "Channel:       $SCN_CHANNEL"
+print_none "Duration:      $SCN_DURATION seconds"
+print_blank
+print_action "Launch Capture"
 confirmation
 
 # ─── Run Simulation ───
 clear
 print_section "Simulation"
 
-print_info "Launch AP profile $SCN_PROFILE manually on WAPT for $SCN_DURATION seconds"
-confirmation
 print_waiting "AP profile $SCN_PROFILE available for: $SCN_DURATION seconds"
 sleep "$SCN_DURATION"
 print_action "Stop AP profile $SCN_PROFILE"

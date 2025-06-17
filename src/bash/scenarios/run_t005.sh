@@ -17,41 +17,44 @@ source "$HELPERS_DIR/fn_mode.sh"
 source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_prompt.sh"
 
-# ─── Show Introduction ───
-print_none "Objective: This scenario simluates an attacker deploying an unauthorised, open Wi-Fi access point in a trusted network environment.  The goal is to lure unsuspecitng users to connect, thereby enabled passive traffic observation or active manipulation (e.g. DNS spoofing, phishing pages, or data capture).
+# ─── Show Scenario ───
+print_none "Threat:        $SCN_NAME"
+print_none "Tool:          $SCN_TOOL"
+print_none "Mode:          $SCN_MODE"
+print_blank
+print_wrapped_indent "Objective: " \
+"This scenario simluates an attacker deploying an unauthorised, open Wi-Fi access point in a trusted network environment.  The goal is to lure unsuspecitng users to connect, thereby enabled passive traffic observation or active manipulation (e.g. DNS spoofing, phishing pages, or data capture).
 
 Unlike Evil Twin attacks, this rogue AP does not impersonate a known SSID - it presents a new, legitimate-looking network name (e.g. "Guest_WiFi" or "FreePublicWiFi") designed to attract users."
+print_line
 
 confirmation
 
-# ─── Show Pre-reqs ───
-print_section "Scenario Pre-requisites"
-print_none "1. T005: WPA2 AP profile (WSTT-T005-WPA2) must be active"
-print_none "2. T005: Rogue access point (WSTT-T005-Guest) will be launched"
-print_none "3. WSTT full/filtered capture must be started before simulation begins"
+# ─── Show Requirements ───
+print_section "Requirements"
+print_none "1. AP Profile: $SCN_PROFILE"
+print_none "2. Client Device must be associated with Rogue AP SSID: $SCN_ROGUE_SSID when launched"
 print_blank
 
-# ─── Show Parameters ───
-print_section "Simulation Parameters"
-print_none "Threat          : $SCN_NAME ($SCN_ID)"
-print_none "Interface       : $INTERFACE"
-print_none "Tool            : $SCN_TOOL"
-print_none "Mode            : $SCN_MODE"
-
-confirmation
-
 # ─── Show AP Config ───
-print_section "Access Point / Client Preparation"
-print_none "1. Launch AP profile $SCN_PROFILE on WAPT"
-print_none "2. Prepare a client device to join the Rogue AP SSID: $SCN_ROGUE_SSID"
+print_section "Access Point Preparation"
+print_none "AP Profile:    $SCN_PROFILE"
+print_none "SSID:          $SCN_SSID"
+print_none "BSSID:         $SCN_BSSID"
+print_none "Channel:       $SCN_CHANNEL"
+print_blank
+print_action "Launch Access Point"
 
 confirmation
 
 # ─── Show Capture Config ───
-print_section "WSTT Capture Preparation"
-print_action "Launch a full or filtered capture using WSTT"
-print_none "Duration        : $SCN_DURATION seconds"
-print_none "Capture Channel : $SCN_CHANNEL"
+print_section "Capture Preparation"
+print_none "Type:          $SCN_CAPTURE"
+print_none "BSSID:         $SCN_BSSID"
+print_none "Channel:       $SCN_CHANNEL"
+print_none "Duration:      $SCN_DURATION seconds"
+print_blank
+print_action "Launch Capture"
 
 confirmation
 

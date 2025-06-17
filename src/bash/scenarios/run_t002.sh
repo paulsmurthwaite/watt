@@ -38,34 +38,37 @@ simulate_probe_requests() {
     done
 }
 
-# ─── Show Introduction ───
-print_none "Objective: This scenario demonstrates the ability of a passive attacker to capture wireless probe request frames transmitted by client devices.  These frames are sent when clients actively search for known Wi-Fi networks (SSIDs), often revealing previous connection history and preferred network names.
+# ─── Show Scenario ───
+print_none "Threat:        $SCN_NAME"
+print_none "Tool:          $SCN_TOOL"
+print_none "Mode:          $SCN_MODE"
+print_blank
+print_wrapped_indent "Objective: " \
+"This scenario demonstrates the ability of a passive attacker to capture wireless probe request frames transmitted by client devices.  These frames are sent when clients actively search for known Wi-Fi networks (SSIDs), often revealing previous connection history and preferred network names.
 
 The attacker listens silently on the wireless channel to capture these requests.  This can be used to:
 
-- profile a user's historical locations or home/office networks
-- identify targets for directed attacks (e.g. Evil Twin or Directed Probe Response)
-- correlate device behaviour with unique identifiers (e.g. MAC addresses)"
+1. Profile a user's historical locations or home/office networks
+2. Identify targets for directed attacks (e.g. Evil Twin or Directed Probe Response)
+3. Correlate device behaviour with unique identifiers (e.g. MAC addresses)"
+print_line
 
 confirmation
 
-# ─── Show Pre-reqs ───
-print_section "Scenario Pre-requisites"
-print_none "1. WSTT full/filtered capture"
+# ─── Show Requirements ───
+print_section "Requirements"
+print_none "1. AP Profile: $SCN_PROFILE"
 print_blank
 
-# ─── Show Parameters ───
-print_section "Simulation Parameters"
-print_none "Threat     : $SCN_NAME ($SCN_ID)"
-print_none "Interface  : $INTERFACE"
-print_none "Tool       : $SCN_TOOL"
-print_none "Mode       : $SCN_MODE"
-confirmation
-
 # ─── Show Capture Config ───
-print_section "WSTT Capture Preparation"
-print_action "Launch a full spectrum capture using WSTT"
-print_none "Duration   : $SCN_DURATION seconds"
+print_section "Capture Preparation"
+print_none "Type:          $SCN_CAPTURE"
+print_none "BSSID:         $SCN_BSSID"
+print_none "Channel:       $SCN_CHANNEL"
+print_none "Duration:      $SCN_DURATION seconds"
+print_blank
+print_action "Launch Capture"
+
 confirmation
 
 # ─── Run Simulation ───
