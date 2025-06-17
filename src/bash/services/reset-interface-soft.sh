@@ -13,5 +13,5 @@ source "$CONFIG_DIR/global.conf"
 source "$HELPERS_DIR/fn_print.sh"
 
 # Soft reset
-bash "$SERVICES_DIR/set-interface-down.sh" # Down
-bash "$SERVICES_DIR/set-interface-up.sh" # Up
+bash "$SERVICES_DIR/set-interface-down.sh"
+bash "$SERVICES_DIR/set-interface-up.sh"

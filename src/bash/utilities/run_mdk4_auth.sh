@@ -35,7 +35,7 @@ SERVICES_DIR="$BASH_DIR/services"
 # ─── Configs ───
 source "$CONFIG_DIR/global.conf"
 ATK_DURATION=60
-ATK_AUTH_PPS=150  # Packets per second
+ATK_AUTH_PPS=150
 ATK_BSSID="02:00:00:00:00:02"
 
 # ─── Helpers ───

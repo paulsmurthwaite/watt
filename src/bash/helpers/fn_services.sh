@@ -1,6 +1,4 @@
 #!/bin/bash
-# ─── Internal Service Helpers for AP Profiles ───
-# Sourced by start-ap.sh and stop-ap.sh
 
 # ─── HTTP ───
 start_http_server() {
@@ -29,7 +27,7 @@ start_http_server() {
     HTTP_PID=$(pgrep -n -f "http.server 80")
     echo "$HTTP_PID" > /tmp/wstt_http_server.pid
 
-    sleep 1  # allow server time to bind
+    sleep 1
 
     if ps -p "$HTTP_PID" > /dev/null; then
         print_success "HTTP server started (PID: $HTTP_PID)"
@@ -59,7 +57,7 @@ stop_http_server() {
 # ─── DNS ───
 start_dns_service() {
     print_action "Configuring DNS"
-    sudo systemctl stop systemd-resolved  # Local override
+    sudo systemctl stop systemd-resolved
 
     sudo rm -f /etc/resolv.conf
     echo "nameserver 9.9.9.9" | sudo tee /etc/resolv.conf > /dev/null
@@ -78,7 +76,7 @@ stop_dns_service() {
 
     print_action "Resetting DNS"
     sudo systemctl start systemd-resolved
-    sudo rm -f /etc/resolv.conf  # Relink /etc/resolv.conf
+    sudo rm -f /etc/resolv.conf
     sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 }
 

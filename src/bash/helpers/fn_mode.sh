@@ -1,5 +1,4 @@
 #!/bin/bash
-# ─── Check Interface Mode ───
 
 # ─── Monitor ───
 ensure_monitor_mode() {

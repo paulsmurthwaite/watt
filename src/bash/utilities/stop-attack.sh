@@ -1,7 +1,4 @@
 #!/bin/bash
-# Utility: Stops any running wireless attack launched from WATT
-# Usage: ./stop-attack.sh
-
 set -e
 
 # ─── Paths ───

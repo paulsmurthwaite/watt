@@ -35,8 +35,8 @@ SERVICES_DIR="$BASH_DIR/services"
 # ─── Configs ───
 source "$CONFIG_DIR/global.conf"
 ATK_DURATION=60
-ATK_TARGET_IP="10.0.0.120"  # Known client IP
-FWD_INTERFACE="ens33"  # WATT forwarding interface
+ATK_TARGET_IP="10.0.0.120"
+FWD_INTERFACE="ens33"
 
 # ─── Helpers ───
 source "$HELPERS_DIR/fn_print.sh"

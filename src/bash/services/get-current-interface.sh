@@ -14,7 +14,7 @@ source "$HELPERS_DIR/fn_print.sh"
 
 # Read interface state
 LINK_OUTPUT=$(ip link show "$INTERFACE")
-STATE=$(echo "$LINK_OUTPUT" | grep "UP")  # Extract UP indicator
+STATE=$(echo "$LINK_OUTPUT" | grep "UP")
 
 # Read interface mode
 MODE=$(iw dev "$INTERFACE" info | awk '/type/ {print $2}')

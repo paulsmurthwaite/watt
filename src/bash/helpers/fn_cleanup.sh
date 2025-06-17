@@ -1,4 +1,5 @@
 #!/bin/bash
+# Called by Developer Tools scripts
 
 cleanup() {
     print_blank

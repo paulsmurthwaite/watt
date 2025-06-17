@@ -1,5 +1,4 @@
 #!/bin/bash
-# ─── Standardise Output Formatting ───
 
 print_section() {
     echo -e "\033[1m[ $1 ]\033[0m"
