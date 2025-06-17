@@ -31,32 +31,31 @@ print_blank
 
 # ─── Show Parameters ───
 print_section "Simulation Parameters"
-print_none "Threat          : $T006_NAME ($T006_ID)"
+print_none "Threat          : $SCN_NAME ($SCN_ID)"
 print_none "Interface       : $INTERFACE"
-print_none "Tool            : $T006_TOOL"
-print_none "Mode            : $T006_MODE"
+print_none "Tool            : $SCN_TOOL"
+print_none "Mode            : $SCN_MODE"
 
 confirmation
 
 # ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full or filtered capture using WSTT"
-print_none "Duration        : $T006_DURATION seconds"
-print_none "Capture Channel : $T006_CHANNEL"
+print_none "Duration        : $SCN_DURATION seconds"
+print_none "Capture Channel : $SCN_CHANNEL"
 confirmation
 
 # ─── Run Simulation ───
 clear
-print_section "Simulation Running"
-print_info "You will now launch AP profile $T006_PROFILE manually on WAPT for $T006_DURATION seconds"
+print_section "Simulation"
 
+print_info "Launch AP profile $SCN_PROFILE manually on WAPT for $SCN_DURATION seconds"
 confirmation
-print_action "Launch AP profile: $T006_PROFILE"
-print_waiting "AP profile available for: $T006_DURATION seconds"
-sleep "$T006_DURATION"
-print_action "Stop AP profile: $T006_PROFILE"
-
+print_waiting "AP profile $SCN_PROFILE available for: $SCN_DURATION seconds"
+sleep "$SCN_DURATION"
+print_action "Stop AP profile $SCN_PROFILE"
 EXIT_CODE=$?
+
 print_blank
 
 if (( EXIT_CODE == 0 )); then

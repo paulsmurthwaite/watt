@@ -30,13 +30,13 @@ print_blank
 
 # ─── Show Parameters ───
 print_section "Simulation Parameters"
-print_none "Threat    : $T008_NAME ($T008_ID)"
+print_none "Threat    : $SCN_NAME ($SCN_ID)"
 print_none "Interface : $INTERFACE"
-print_none "Tool      : $T008_TOOL"
-print_none "Mode      : $T008_MODE"
-print_none "SSID File : $T008_SSID_FILE"
-print_none "Interval  : $T008_INTERVAL ms"
-print_none "Duration  : $T008_DURATION seconds"
+print_none "Tool      : $SCN_TOOL"
+print_none "Mode      : $SCN_MODE"
+print_none "SSID File : $SCN_SSID_FILE"
+print_none "Interval  : $SCN_INTERVAL ms"
+print_none "Duration  : $SCN_DURATION seconds"
 
 confirmation
 
@@ -44,30 +44,30 @@ confirmation
 print_section "WSTT Capture Preparation"
 print_action "Launch a full capture using WSTT"
 print_none "Ensure monitor mode is enabled and no filters are applied"
-print_none "Duration  : $T008_DURATION seconds"
+print_none "Duration  : $SCN_DURATION seconds"
 
 confirmation
 
 # ─── Run Simulation ───
 clear
-print_section "Simulation Running"
+print_section "Simulation"
 
 ensure_monitor_mode
-SSID_FILE="$UTILITIES_DIR/$T008_SSID_FILE"
+SSID_FILE="$UTILITIES_DIR/$SCN_SSID_FILE"
 
 if [[ -f "$SSID_FILE" ]]; then
     print_blank
-    print_info "Using existing SSID list: $T008_SSID_FILE"
+    print_info "Using existing SSID list: $SCN_SSID_FILE"
 else
     print_blank
-    print_action "Generating SSID list: $T008_SSID_FILE"
+    print_action "Generating SSID list: $SCN_SSID_FILE"
     seq -f "SSID-%03g" 1 100 > "$SSID_FILE"
     print_success "Generated 100 SSIDs"
 fi
 
 print_blank
-print_waiting "Launching Beacon Flood"
-sudo timeout "$T008_DURATION" mdk4 "$INTERFACE" b -f "$SSID_FILE" -s "$T008_INTERVAL"
+print_waiting "Running"
+sudo timeout "$SCN_DURATION" mdk4 "$INTERFACE" b -f "$SSID_FILE" -s "$SCN_INTERVAL"
 EXIT_CODE=$?
 ensure_managed_mode
 

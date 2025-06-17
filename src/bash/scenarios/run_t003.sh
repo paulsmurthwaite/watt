@@ -31,34 +31,34 @@ print_blank
 
 # ─── Show Parameters ───
 print_section "Simulation Parameters"
-print_none "Threat          : $T003_NAME ($T003_ID)"
+print_none "Threat          : $SCN_NAME ($SCN_ID)"
 print_none "Interface       : $INTERFACE"
-print_none "Tool            : $T003_TOOL"
-print_none "Mode            : $T003_MODE"
+print_none "Tool            : $SCN_TOOL"
+print_none "Mode            : $SCN_MODE"
 
 confirmation
 
 # ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full or filtered capture using WSTT"
-print_none "Duration        : $T003_DURATION seconds"
-print_none "Capture Channel : $T003_CHANNEL"
+print_none "Duration        : $SCN_DURATION seconds"
+print_none "Capture Channel : $SCN_CHANNEL"
 
 confirmation
 
 # ─── Run Simulation ───
 clear
-print_section "Simulation Running"
-print_info "You will now launch each AP profile manually on WAPT for $T003_INTERVAL seconds each."
+print_section "Simulation"
+print_info "Launch each AP profile manually on WAPT for $SCN_INTERVAL seconds each."
 
-for PROFILE in "${T003_PROFILES[@]}"; do
+for PROFILE in "${SCN_PROFILES[@]}"; do
     PROFILE_NAME="${PROFILE%.cfg}"  # strip .cfg
     confirmation
     print_action "Launch AP profile: $PROFILE_NAME"
-    print_waiting "AP profile available for: $T003_INTERVAL seconds"
-    sleep "$T003_INTERVAL"
+    print_waiting "AP profile available for: $SCN_INTERVAL seconds"
+    sleep "$SCN_INTERVAL"
     print_action "Stop AP profile: $PROFILE_NAME"
-    sleep "$T003_PAUSE"
+    sleep "$SCN_PAUSE"
 done
 
 EXIT_CODE=$?

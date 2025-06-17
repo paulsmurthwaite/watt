@@ -31,39 +31,39 @@ print_blank
 
 # ─── Show Parameters ───
 print_section "Simulation Parameters"
-print_none "Threat     : $T016_NAME ($T016_ID)"
+print_none "Threat     : $SCN_NAME ($SCN_ID)"
 print_none "Interface  : $INTERFACE"
-print_none "Tool       : $T016_TOOL"
-print_none "Mode       : $T016_MODE"
+print_none "Tool       : $SCN_TOOL"
+print_none "Mode       : $SCN_MODE"
 
 confirmation
 
 # ─── Show AP Config ───
 print_section "Access Point & Client Preparation"
 print_action "Launch a Spoofed SSID Access Point and associate a client device then shutdown the Spoofed SSID Access Point"
-print_none "SSID    : $T016_PROBE_SSID"
-print_none "BSSID   : $T016_PROBE_BSSID"
-print_none "Channel : $T016_CHANNEL"
+print_none "SSID    : $SCN_SSID"
+print_none "BSSID   : $SCN_BSSID"
+print_none "Channel : $SCN_CHANNEL"
 
 confirmation
 
 # ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full or filtered capture using WSTT"
-print_none "BSSID      : $T016_PROBE_BSSID"
-print_none "Channel    : $T016_CHANNEL"
-print_none "Duration   : $T016_DURATION seconds"
+print_none "BSSID      : $SCN_BSSID"
+print_none "Channel    : $SCN_CHANNEL"
+print_none "Duration   : $SCN_DURATION seconds"
 
 confirmation
 
 # ─── Run Simulation ───
 clear
-print_section "Simulation Running"
+print_section "Simulation"
 
 ensure_monitor_mode
 print_blank
-print_info "Launching Directed Probe Response"
-sudo timeout "$T016_DURATION" airbase-ng -e "$T016_PROBE_SSID" -c "$T016_CHANNEL" -a "$T016_PROBE_BSSID" "$INTERFACE"
+print_waiting "Running"
+sudo timeout "$SCN_DURATION" airbase-ng -e "$SCN_SSID" -c "$SCN_CHANNEL" -a "$SCN_BSSID" "$INTERFACE"
 EXIT_CODE=$?
 ensure_managed_mode
 

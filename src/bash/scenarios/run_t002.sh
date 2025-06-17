@@ -24,16 +24,16 @@ simulate_probe_requests() {
     while true; do
         CURRENT_TIME=$(date +%s)
         ELAPSED=$((CURRENT_TIME - START_TIME))
-        if (( ELAPSED >= T002_DURATION )); then
+        if (( ELAPSED >= SCN_DURATION )); then
             break
         fi
 
         # ─── Probes ───
-        for SSID in "${T002_SSIDS[@]}"; do
+        for SSID in "${SCN_SSIDS[@]}"; do
             print_action "Probing for SSID: $SSID"
             nmcli device wifi connect "$SSID" ifname "$INTERFACE" >/dev/null 2>&1 || true
             nmcli device disconnect "$INTERFACE" >/dev/null 2>&1
-            sleep "$T002_INTERVAL"
+            sleep "$SCN_INTERVAL"
         done
     done
 }
@@ -56,23 +56,24 @@ print_blank
 
 # ─── Show Parameters ───
 print_section "Simulation Parameters"
-print_none "Threat     : $T002_NAME ($T002_ID)"
+print_none "Threat     : $SCN_NAME ($SCN_ID)"
 print_none "Interface  : $INTERFACE"
-print_none "Tool       : $T002_TOOL"
-print_none "Mode       : $T002_MODE"
+print_none "Tool       : $SCN_TOOL"
+print_none "Mode       : $SCN_MODE"
 confirmation
 
 # ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full spectrum capture using WSTT"
-print_none "Duration   : $T002_DURATION seconds"
+print_none "Duration   : $SCN_DURATION seconds"
 confirmation
 
 # ─── Run Simulation ───
 clear
-print_section "Simulation Running"
+print_section "Simulation"
 
 ensure_managed_mode
+print_waiting "Running"
 simulate_probe_requests
 
 EXIT_CODE=$?

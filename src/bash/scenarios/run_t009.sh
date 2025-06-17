@@ -30,39 +30,39 @@ print_blank
 
 # ─── Show Parameters ───
 print_section "Simulation Parameters"
-print_none "Threat    : $T009_NAME ($T009_ID)"
+print_none "Threat    : $SCN_NAME ($SCN_ID)"
 print_none "Interface : $INTERFACE"
-print_none "Tool      : $T009_TOOL"
-print_none "Mode      : $T009_MODE"
-print_none "PPS       : $T009_AUTH_PPS"
+print_none "Tool      : $SCN_TOOL"
+print_none "Mode      : $SCN_MODE"
+print_none "PPS       : $SCN_AUTH_PPS"
 
 confirmation
 
 # ─── Show AP Config ───
 print_section "Access Point / Client Preparation"
 print_action "Launch Access Point"
-print_none "BSSID     : $T009_BSSID"
-print_none "Channel   : $T009_CHANNEL"
+print_none "BSSID     : $SCN_BSSID"
+print_none "Channel   : $SCN_CHANNEL"
 
 confirmation
 
 # ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full or filtered capture using WSTT"
-print_none "BSSID     : $T009_BSSID"
-print_none "Channel   : $T009_CHANNEL"
-print_none "Duration  : $T009_DURATION seconds"
+print_none "BSSID     : $SCN_BSSID"
+print_none "Channel   : $SCN_CHANNEL"
+print_none "Duration  : $SCN_DURATION seconds"
 
 confirmation
 
 # ─── Run Simulation ───
 clear
-print_section "Simulation Running"
+print_section "Simulation"
 
 ensure_monitor_mode
 print_blank
-print_waiting "Launching Authentication Flood"
-sudo timeout "$T009_DURATION" mdk4 "$INTERFACE" a -a "$T009_BSSID" -s "$T009_AUTH_PPS"
+print_waiting "Running"
+sudo timeout "$SCN_DURATION" mdk4 "$INTERFACE" a -a "$SCN_BSSID" -s "$SCN_AUTH_PPS"
 EXIT_CODE=$?
 ensure_managed_mode
 

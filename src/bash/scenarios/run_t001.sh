@@ -58,7 +58,7 @@ confirmation
 
 # ─── Run Simulation ───
 clear
-print_section "Simulation Running"
+print_section "Simulation"
 
 # ─── Associate with AP ───
 print_action "Associating with AP SSID: $SCN_SSID"

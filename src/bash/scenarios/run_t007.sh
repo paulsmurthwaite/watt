@@ -30,38 +30,35 @@ print_blank
 
 # ─── Show Parameters ───
 print_section "Simulation Parameters"
-print_none "Threat    : $T007_NAME ($T007_ID)"
+print_none "Threat    : $SCN_NAME ($SCN_ID)"
 print_none "Interface : $INTERFACE"
-print_none "Tool      : $T007_TOOL"
-print_none "Mode      : $T007_MODE"
+print_none "Tool      : $SCN_TOOL"
+print_none "Mode      : $SCN_MODE"
 
 confirmation
 
 # ─── Show AP Config ───
 print_section "Access Point / Client Preparation"
-print_action "Launch a WPA2-PSK Access Point"
-print_none "BSSID     : $T007_BSSID"
-print_none "Channel   : $T007_CHANNEL"
+print_none "Profile   : $SCN_PROFILE"
 
 confirmation
 
 # ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full or filtered capture using WSTT"
-print_none "BSSID     : $T007_BSSID"
-print_none "Channel   : $T007_CHANNEL"
-print_none "Duration  : $T007_DURATION seconds"
+print_none "BSSID     : $SCN_BSSID"
+print_none "Channel   : $SCN_CHANNEL"
+print_none "Duration  : $SCN_DURATION seconds"
 
 confirmation
 
 # ─── Run Simulation ───
 clear
-print_section "Simulation Running"
+print_section "Simulation"
 
 ensure_monitor_mode
-print_blank
-print_waiting "Launching Deauthentication Flood"
-sudo timeout "$T007_DURATION" mdk4 "$INTERFACE" d -B "$T007_BSSID" -c "$T007_CHANNEL"
+print_waiting "Running"
+sudo timeout "$SCN_DURATION" mdk4 "$INTERFACE" d -B "$SCN_BSSID" -c "$SCN_CHANNEL"
 EXIT_CODE=$?
 ensure_managed_mode
 

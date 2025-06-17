@@ -31,34 +31,34 @@ print_blank
 
 # ─── Show Parameters ───
 print_section "Simulation Parameters"
-print_none "Threat    : $T015_NAME ($T015_ID)"
+print_none "Threat    : $SCN_NAME ($SCN_ID)"
 print_none "Interface : $INTERFACE"
-print_none "Tool      : $T015_TOOL"
-print_none "Mode      : $T015_MODE"
+print_none "Tool      : $SCN_TOOL"
+print_none "Mode      : $SCN_MODE"
 
 confirmation
 
 # ─── Show AP Config ───
 print_section "Access Point / Client Preparation"
 print_action "Launch Access Point and associate a client device then shutdown the Access Point"
-print_none "SSID      : $T015_SSID"
-print_none "BSSID     : $T015_BSSID"
-print_none "Channel   : $T015_CHANNEL"
+print_none "SSID      : $SCN_SSID"
+print_none "BSSID     : $SCN_BSSID"
+print_none "Channel   : $SCN_CHANNEL"
 
 confirmation
 
 # ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full or filtered capture using WSTT"
-print_none "BSSID     : $T015_BSSID"
-print_none "Channel   : $T015_CHANNEL"
-print_none "Duration  : $T015_DURATION seconds"
+print_none "BSSID     : $SCN_BSSID"
+print_none "Channel   : $SCN_CHANNEL"
+print_none "Duration  : $SCN_DURATION seconds"
 
 confirmation
 
 # ─── Run Simulation ───
 clear
-print_section "Simulation Running"
+print_section "Simulation"
 
 # ─── Start AP ───
 bash "$HELPERS_DIR/fn_start-ap.sh" t015

@@ -57,7 +57,7 @@ confirmation
 
 # ─── Run Simulation ───
 clear
-print_section "Simulation Running"
+print_section "Simulation"
 
 # ─── Start AP ───
 bash "$HELPERS_DIR/fn_start-ap.sh" t005
