@@ -257,11 +257,9 @@ def show_menu():
     ui_standard_header("Main Menu")
 
     # Menu block
-    ui_header("Playbooks")
+    ui_header("Simulations")
     print("[1]  Threat Scenarios")
-    print()
-    ui_header("Tools")
-    print("[2]  Attack Tools")
+    print("[2]  Developer Tools")
     print()
     ui_header("Services")
     print("[3]  Service Control")
@@ -367,8 +365,8 @@ def threat_scenario():
         "4":  threat_t004,
         "5":  threat_t005,
         "6":  threat_t006,
-        "7":  threat_t008,
-        "8":  threat_t007,      
+        "7":  threat_t007,      
+        "8":  threat_t008,
         "9":  threat_t009,
         "10":  threat_t014,
         "11":  threat_t015,
@@ -382,18 +380,14 @@ def threat_scenario():
         ui_standard_header("Threat Scenarios")
 
         # Menu block
-        ui_header("Access Point Threats")
         print("[1]  Run Unencrypted Traffic Capture scenario (T001)")
         print("[2]  Run Probe Request Snooping scenario (T002)")
         print("[3]  Run SSID Harvesting scenario (T003)")
         print("[4]  Run Evil Twin Attack scenario (T004)")
         print("[5]  Run Open Rogue AP scenario (T005)")
         print("[6]  Run Misconfigured Access Point scenario (T006)")
-        print("[7]  Run Beacon Flood scenario (T008)")
-        print()
-
-        ui_header("Client-side Threats")
-        print("[8]  Run Deauthentication Flood scenario (T007)")
+        print("[7]  Run Deauthentication Flood scenario (T007)")
+        print("[8]  Run Beacon Flood scenario (T008)")
         print("[9]  Run Authentication Flood scenario (T009)")
         print("[10] Run ARP Spoofing from Wireless Entry Point scenario (T014)")
         print("[11] Run Malicious Hotspot Auto-Connect scenario (T015)")
@@ -450,7 +444,7 @@ def dev_tools():
         ui_clear_screen()
 
         # Header block
-        ui_standard_header("Attack Tools")
+        ui_standard_header("Developer Tools")
 
         print("[1]  Launch Deauthentication Flood Attack (T007)")
         print("[2]  Launch Beacon Flood Attack (T008)")
