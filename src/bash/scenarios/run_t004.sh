@@ -43,7 +43,6 @@ print_none "1. Client device must have previously associated with AP: $SCN_SSID"
 print_none "2. Client device must have auto-connect enabled for SSID: $SCN_SSID"
 print_none "3. AP profile: $SCN_PROFILE must be offline"
 
-
 confirmation
 
 # ─── Show Capture Config ───

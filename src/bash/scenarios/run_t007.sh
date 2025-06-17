@@ -17,38 +17,41 @@ source "$HELPERS_DIR/fn_mode.sh"
 source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_prompt.sh"
 
-# ─── Show Introduction ───
-print_none "This scenario simulates a high-volume deauth flood intended to forcibly disconnect clients from an AP."
+# ─── Show Scenario ───
+print_none "Threat:        $SCN_NAME"
+print_none "Tool:          $SCN_TOOL"
+print_none "Mode:          $SCN_MODE"
+print_blank
+print_wrapped_indent "Objective: " \
+"This scenario simulates a high-volume deauth flood intended to forcibly disconnect clients from an AP."
+print_line
 
 confirmation
 
-# ─── Show Pre-reqs ───
-print_section "Scenario Pre-requisites"
-print_none "1. WPA2-PSK Access Point with associated client"
-print_none "2. WSTT full/filtered capture"
+# ─── Show Requirements ───
+print_section "Requirements"
+print_none "1. AP Profile: $SCN_PROFILE"
 print_blank
 
-# ─── Show Parameters ───
-print_section "Simulation Parameters"
-print_none "Threat    : $SCN_NAME ($SCN_ID)"
-print_none "Interface : $INTERFACE"
-print_none "Tool      : $SCN_TOOL"
-print_none "Mode      : $SCN_MODE"
-
-confirmation
-
 # ─── Show AP Config ───
-print_section "Access Point / Client Preparation"
-print_none "Profile   : $SCN_PROFILE"
+print_section "Access Point Preparation"
+print_none "AP Profile:    $SCN_PROFILE"
+print_none "SSID:          $SCN_SSID"
+print_none "BSSID:         $SCN_BSSID"
+print_none "Channel:       $SCN_CHANNEL"
+print_blank
+print_action "Launch Access Point"
 
 confirmation
 
 # ─── Show Capture Config ───
-print_section "WSTT Capture Preparation"
-print_action "Launch a full or filtered capture using WSTT"
-print_none "BSSID     : $SCN_BSSID"
-print_none "Channel   : $SCN_CHANNEL"
-print_none "Duration  : $SCN_DURATION seconds"
+print_section "Capture Preparation"
+print_none "Type:          $SCN_CAPTURE"
+print_none "BSSID:         $SCN_BSSID"
+print_none "Channel:       $SCN_CHANNEL"
+print_none "Duration:      $SCN_DURATION seconds"
+print_blank
+print_action "Launch Capture"
 
 confirmation
 

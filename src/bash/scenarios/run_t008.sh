@@ -17,34 +17,32 @@ source "$HELPERS_DIR/fn_mode.sh"
 source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_prompt.sh"
 
-# ─── Show Introduction ───
-print_none "This scenario simulates a Beacon Flood attack.  Fake access points are broadcast at high volume to flood the wireless spectrum with phantom SSIDs."
+# ─── Show Scenario ───
+print_none "Threat:        $SCN_NAME"
+print_none "Tool:          $SCN_TOOL"
+print_none "Mode:          $SCN_MODE"
+print_blank
+print_wrapped_indent "Objective: " \
+"This scenario simulates a Beacon Flood attack.  Fake access points are broadcast at high volume to flood the wireless spectrum with phantom SSIDs."
+print_line
 
 confirmation
 
-# ─── Show Pre-reqs ───
-print_section "Scenario Pre-requisites"
-print_none "1. No real access point is required"
-print_none "2. WSTT full or filtered capture is recommended to observe fake SSID broadcasts"
-print_blank
+# ─── Show Requirements ───
+print_section "Requirements"
+print_none "1. AP Profile: $SCN_PROFILE"
 
-# ─── Show Parameters ───
-print_section "Simulation Parameters"
-print_none "Threat    : $SCN_NAME ($SCN_ID)"
-print_none "Interface : $INTERFACE"
-print_none "Tool      : $SCN_TOOL"
-print_none "Mode      : $SCN_MODE"
-print_none "SSID File : $SCN_SSID_FILE"
-print_none "Interval  : $SCN_INTERVAL ms"
-print_none "Duration  : $SCN_DURATION seconds"
 
 confirmation
 
 # ─── Show Capture Config ───
-print_section "WSTT Capture Preparation"
-print_action "Launch a full capture using WSTT"
-print_none "Ensure monitor mode is enabled and no filters are applied"
-print_none "Duration  : $SCN_DURATION seconds"
+print_section "Capture Preparation"
+print_none "Type:          $SCN_CAPTURE"
+print_none "BSSID:         $SCN_BSSID"
+print_none "Channel:       $SCN_CHANNEL"
+print_none "Duration:      $SCN_DURATION seconds"
+print_blank
+print_action "Launch Capture"
 
 confirmation
 
