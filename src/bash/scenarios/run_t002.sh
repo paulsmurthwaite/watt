@@ -1,5 +1,4 @@
 #!/bin/bash
-# ─── T002 Probe Request Snooping ───
 
 # ─── Paths ───
 BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -13,7 +12,7 @@ UTILITIES_DIR="$BASH_DIR/utilities"
 source "$CONFIG_DIR/global.conf"
 source "$CONFIG_DIR/t002.conf"
 
-# ─── Helpers ───
+# ─── Dependencies ───
 source "$HELPERS_DIR/fn_mode.sh"
 source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_prompt.sh"
@@ -39,7 +38,7 @@ simulate_probe_requests() {
     done
 }
 
-# ─── Show Simulation ───
+# ─── Show Introduction ───
 print_none "Objective: This scenario demonstrates the ability of a passive attacker to capture wireless probe request frames transmitted by client devices.  These frames are sent when clients actively search for known Wi-Fi networks (SSIDs), often revealing previous connection history and preferred network names.
 
 The attacker listens silently on the wireless channel to capture these requests.  This can be used to:
@@ -47,14 +46,15 @@ The attacker listens silently on the wireless channel to capture these requests.
 - profile a user's historical locations or home/office networks
 - identify targets for directed attacks (e.g. Evil Twin or Directed Probe Response)
 - correlate device behaviour with unique identifiers (e.g. MAC addresses)"
-print_blank
+
+confirmation
 
 # ─── Show Pre-reqs ───
 print_section "Scenario Pre-requisites"
 print_none "1. WSTT full/filtered capture"
 print_blank
 
-# ─── Show Params ───
+# ─── Show Parameters ───
 print_section "Simulation Parameters"
 print_none "Threat     : $T002_NAME ($T002_ID)"
 print_none "Interface  : $INTERFACE"
@@ -62,15 +62,15 @@ print_none "Tool       : $T002_TOOL"
 print_none "Mode       : $T002_MODE"
 confirmation
 
-# ─── Show Capture ───
+# ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full spectrum capture using WSTT"
 print_none "Duration   : $T002_DURATION seconds"
 confirmation
 
 # ─── Run Simulation ───
-print_section "Simulation Started"
-print_waiting "Running $T002_NAME ($T002_ID)"
+clear
+print_section "Simulation Running"
 
 ensure_managed_mode
 simulate_probe_requests
@@ -78,10 +78,10 @@ simulate_probe_requests
 EXIT_CODE=$?
 print_blank
 
-if [[ "$EXIT_CODE" -ne 0 ]]; then
-    print_fail "Simulation stopped (Code: $EXIT_CODE)"
-else
+if (( EXIT_CODE == 0 )); then
     print_success "Simulation completed"
+else
+    print_fail "Simulation stopped (Code: $EXIT_CODE)"
 fi
 
 exit 0

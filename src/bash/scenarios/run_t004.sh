@@ -17,7 +17,7 @@ source "$HELPERS_DIR/fn_mode.sh"
 source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_prompt.sh"
 
-# ─── Show Simulation ───
+# ─── Show Introduction ───
 print_none "This scenario simulates an attacker broadcasting a rogue access point with the same SSID and BSSID as a genuine Wi-Fi network in order to device client devices into associating with it.  The goal is to exploit auto-connect behaviour or signal preferences logic in client devices.
 
 Once connected, clients may transmit sensitive information such as:
@@ -28,7 +28,8 @@ Once connected, clients may transmit sensitive information such as:
 - Any unencrypted service traffic
 
 The scenario forms the basis for further exploration such as captive portal spoofing, man-in-the-middle attacks, or credential harvesting."
-print_blank
+
+confirmation
 
 # ─── Show Pre-reqs ───
 print_section "Scenario Pre-requisites"
@@ -38,7 +39,7 @@ print_none "3. The genuine AP must be offline or out of range"
 print_none "4. WSTT full/filtered capture"
 print_blank
 
-# ─── Show Params ───
+# ─── Show Parameters ───
 print_section "Simulation Parameters"
 print_none "Threat          : $SCN_NAME ($SCN_ID)"
 print_none "Interface       : $INTERFACE"
@@ -47,9 +48,9 @@ print_none "Mode            : $SCN_MODE"
 
 confirmation
 
-# ─── Show Capture ───
+# ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
-print_action "Launch a full/filtered capture using WSTT"
+print_action "Launch a full or filtered capture using WSTT"
 print_none "Duration        : $SCN_DURATION seconds"
 print_none "Capture Channel : $SCN_CHANNEL"
 
@@ -77,14 +78,14 @@ fi
 print_info "Stopping Access Point"
 
 bash "$HELPERS_DIR/fn_stop-ap.sh"
-STOP_EXIT_CODE=$?
+EXIT_CODE=$?
 
 print_blank
 
-if (( STOP_EXIT_CODE == 0 )); then
+if (( EXIT_CODE == 0 )); then
     print_success "Simulation completed"
 else
-    print_fail "Simulation stopped (Code: $STOP_EXIT_CODE)"
+    print_fail "Simulation stopped (Code: $EXIT_CODE)"
 fi
 
 exit 0

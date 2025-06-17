@@ -17,11 +17,12 @@ source "$HELPERS_DIR/fn_mode.sh"
 source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_prompt.sh"
 
-# ─── Show Simulation ───
+# ─── Show Introduction ───
 print_none "Objective: This scenario simluates an attacker deploying an unauthorised, open Wi-Fi access point in a trusted network environment.  The goal is to lure unsuspecitng users to connect, thereby enabled passive traffic observation or active manipulation (e.g. DNS spoofing, phishing pages, or data capture).
 
 Unlike Evil Twin attacks, this rogue AP does not impersonate a known SSID - it presents a new, legitimate-looking network name (e.g. "Guest_WiFi" or "FreePublicWiFi") designed to attract users."
-print_blank
+
+confirmation
 
 # ─── Show Pre-reqs ───
 print_section "Scenario Pre-requisites"
@@ -30,7 +31,7 @@ print_none "2. T005: Rogue access point (WSTT-T005-Guest) will be launched"
 print_none "3. WSTT full/filtered capture must be started before simulation begins"
 print_blank
 
-# ─── Show Params ───
+# ─── Show Parameters ───
 print_section "Simulation Parameters"
 print_none "Threat          : $SCN_NAME ($SCN_ID)"
 print_none "Interface       : $INTERFACE"
@@ -39,16 +40,16 @@ print_none "Mode            : $SCN_MODE"
 
 confirmation
 
-# ─── Show AP/Client config ───
-print_section "Access Point & Client Preparation"
+# ─── Show AP Config ───
+print_section "Access Point / Client Preparation"
 print_none "1. Launch AP profile $SCN_PROFILE on WAPT"
 print_none "2. Prepare a client device to join the Rogue AP SSID: $SCN_ROGUE_SSID"
 
 confirmation
 
-# ─── Show Capture ───
+# ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
-print_action "Launch a full/filtered capture using WSTT"
+print_action "Launch a full or filtered capture using WSTT"
 print_none "Duration        : $SCN_DURATION seconds"
 print_none "Capture Channel : $SCN_CHANNEL"
 
@@ -76,14 +77,14 @@ fi
 print_info "Stopping Access Point"
 
 bash "$HELPERS_DIR/fn_stop-ap.sh"
-STOP_EXIT_CODE=$?
+EXIT_CODE=$?
 
 print_blank
 
-if (( STOP_EXIT_CODE == 0 )); then
+if (( EXIT_CODE == 0 )); then
     print_success "Simulation completed"
 else
-    print_fail "Simulation stopped (Code: $STOP_EXIT_CODE)"
+    print_fail "Simulation stopped (Code: $EXIT_CODE)"
 fi
 
 exit 0

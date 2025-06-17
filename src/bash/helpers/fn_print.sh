@@ -6,31 +6,31 @@ print_section() {
 }
 
 print_info() {
-    echo "[*] $1"
+    echo "[*] $1" | fold -s -w 80
 }
 
 print_success() {
-    echo "[+] $1"
+    echo "[+] $1" | fold -s -w 80
 }
 
 print_fail() {
-    echo "[x] $1"
+    echo "[x] $1" | fold -s -w 80
 }
 
 print_warn() {
-    echo "[!] $1"
+    echo "[!] $1" | fold -s -w 80
 }
 
 print_action() {
-    echo "[>] $1"
+    echo "[>] $1" | fold -s -w 80
 }
 
 print_waiting() {
-    echo "[~] $1"
+    echo "[~] $1" | fold -s -w 80
 }
 
 print_prompt() {
-    echo -n "[?] $1"
+    echo -n "[?] $1" | fold -s -w 80
 }
 
 print_none() {

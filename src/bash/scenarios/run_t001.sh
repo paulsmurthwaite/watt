@@ -29,8 +29,8 @@ print_none "2. WSTT full/filtered capture"
 print_blank
 
 # ─── Show Parameters ───
-print_section "Scenario Parameters"
-print_none "Scenario   : $SCN_NAME ($SCN_ID)"
+print_section "Simulation Parameters"
+print_none "Threat     : $SCN_NAME ($SCN_ID)"
 print_none "Interface  : $INTERFACE"
 print_none "Tool       : $SCN_TOOL"
 print_none "Mode       : $SCN_MODE"

