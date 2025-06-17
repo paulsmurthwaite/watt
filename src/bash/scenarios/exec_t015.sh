@@ -21,8 +21,7 @@ print_blank
 print_info "Running T015 - Malicious Hotspot Auto-Connect attack for $T015_DURATION seconds"
 
 # ─── Launch AP ───
-print_info "Launching spoofed access point: SSID=$T015_SSID, BSSID=$T015_BSSID, Channel=$T015_CHANNEL"
-bash "$UTILITIES_DIR/start-ap_t015.sh" ap_t015 nat
+bash "$HELPERS_DIR/fn_start-ap.sh" t015
 print_info "AP running — waiting for $T015_DURATION seconds"
 sleep "$T015_DURATION"
 

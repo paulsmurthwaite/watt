@@ -60,9 +60,7 @@ clear
 print_section "Simulation Running"
 
 # ─── Start AP ───
-print_info "Launching Access Point"
-
-bash "$UTILITIES_DIR/start-ap_t004.sh" ap_t004 nat
+bash "$HELPERS_DIR/fn_start-ap.sh" t004
 START_EXIT_CODE=$?
 
 if [[ "$START_EXIT_CODE" -ne 0 ]]; then

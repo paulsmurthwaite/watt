@@ -14,26 +14,22 @@ HELPERS_DIR="$BASH_DIR/helpers"
 SCENARIO_DIR="$BASH_DIR/scenarios"
 SERVICES_DIR="$BASH_DIR/services"
 UTILITIES_DIR="$BASH_DIR/utilities"
-CONF_FILE="$CONFIG_DIR/${THREAT_ID,,}.conf"
 
 # ─── Configs ───
-source "$CONFIG_DIR/global.conf"
+CONF_FILE="$CONFIG_DIR/${THREAT_ID,,}.conf"
 
-# ─── Dependencies ───
-source "$HELPERS_DIR/fn_print.sh"
-
-# ─── Validation ───
 if [[ ! -f "$CONF_FILE" ]]; then
     print_fail "Configuration file not found: $CONF_FILE"
     exit 1
 fi
 
+source "$CONFIG_DIR/global.conf"
 source "$CONF_FILE"
 
-if [[ -z "$SCN_GATEWAY" ]]; then
-    print_fail "SCN_GATEWAY variable not set in $CONF_FILE"
-    exit 1
-fi
+# ─── Dependencies  ───
+source "$HELPERS_DIR/fn_mode.sh"
+source "$HELPERS_DIR/fn_print.sh"
+source "$HELPERS_DIR/fn_services.sh"
 
 # ─── Timing ───
 START_TIME=$(date +%s)
