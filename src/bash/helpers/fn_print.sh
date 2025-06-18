@@ -1,7 +1,11 @@
 #!/bin/bash
 
+YELLOW="\033[93m"
+RESET="\033[0m"
+BOLD="\033[1m"
+
 print_section() {
-    echo -e "\033[1m[ $1 ]\033[0m"
+    echo -e "$YELLOW[ $1 ]$RESET"
 }
 
 print_info() {
