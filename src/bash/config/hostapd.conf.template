@@ -7,6 +7,8 @@ channel=$CHANNEL
 hw_mode=g
 auth_algs=1
 ignore_broadcast_ssid=$HIDDEN
+beacon_int=$BEACON_INT
+country_code=$COUNTRY_CODE
 
 wpa=$WPA_MODE
 wpa_passphrase=$PASSPHRASE

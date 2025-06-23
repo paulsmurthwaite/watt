@@ -39,6 +39,10 @@ export INTERFACE SSID CHANNEL HIDDEN WPA_MODE PASSPHRASE BSSID
 # ─── Start AP ───
 print_info "Launching Access Point"
 
+# ─── Unset Optional Parameters (ap_t004) ───
+[[ -z "${BEACON_INT+x}" ]] && unset BEACON_INT
+[[ -z "${COUNTRY_CODE+x}" ]] && unset COUNTRY_CODE
+
 # ─── Generate hostapd.conf ───
 if [[ -z "$WPA_MODE" ]]; then
     print_action "Skipping WPA"
