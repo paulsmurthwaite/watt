@@ -23,7 +23,7 @@ print_none "Tool:          $SCN_TOOL"
 print_none "Mode:          $SCN_MODE"
 print_blank
 print_wrapped_indent "Objective: " \
-"This scenario simulates a spoofed access point responding to directed probe requests from client devices.  This emulates the behaviour of known Wi-Fi networks being impersonated, aiming to trick clients into initiating an auto-connect sequence."
+"This scenario simulates a Karma attack using a Directed Probe Response. The script uses airbase-ng to listen for clients sending directed probe requests for known SSIDs. When a probe for a target SSID is detected, it sends a spoofed response, tricking the client into connecting to the rogue AP."
 print_line
 
 confirmation
@@ -53,7 +53,7 @@ print_section "Simulation"
 ensure_monitor_mode
 print_blank
 print_waiting "Running"
-sudo timeout "$SCN_DURATION" airbase-ng -e "$SCN_SSID" -c "$SCN_CHANNEL" -a "$SCN_BSSID" "$INTERFACE"
+timeout "$SCN_DURATION" airbase-ng -e "$SCN_SSID" -c "$SCN_CHANNEL" -a "$SCN_BSSID" "$INTERFACE"
 EXIT_CODE=$?
 ensure_managed_mode
 

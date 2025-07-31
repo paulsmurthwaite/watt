@@ -23,7 +23,9 @@ print_none "Tool:          $SCN_TOOL"
 print_none "Mode:          $SCN_MODE"
 print_blank
 print_wrapped_indent "Objective: " \
-"This scenario simulates a Beacon Flood attack.  Fake access points are broadcast at high volume to flood the wireless spectrum with phantom SSIDs."
+"This scenario simulates a Beacon Flood attack. The script uses mdk4 to broadcast a high volume of fake beacon frames from a list of SSIDs, flooding the wireless spectrum with phantom networks.
+
+This attack runs on the channel the interface is currently set to. It does not require an AP or client, and the goal is to capture the flood of fake management frames."
 print_line
 
 confirmation
@@ -41,6 +43,7 @@ print_none "Type:          $SCN_CAPTURE"
 print_none "BSSID:         $SCN_BSSID"
 print_none "Channel:       $SCN_CHANNEL"
 print_none "Duration:      $SCN_DURATION seconds"
+print_warn "IMPORTANT: A full-spectrum (channel hopping) capture is recommended to ensure the attack is observed."
 print_blank
 print_action "Launch Capture"
 
@@ -65,7 +68,7 @@ fi
 
 print_blank
 print_waiting "Running"
-sudo timeout "$SCN_DURATION" mdk4 "$INTERFACE" b -f "$SSID_FILE" -s "$SCN_INTERVAL"
+timeout "$SCN_DURATION" mdk4 "$INTERFACE" b -f "$SSID_FILE" -s "$SCN_INTERVAL"
 EXIT_CODE=$?
 ensure_managed_mode
 

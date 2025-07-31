@@ -23,16 +23,15 @@ print_none "Tool:          $SCN_TOOL"
 print_none "Mode:          $SCN_MODE"
 print_blank
 print_wrapped_indent "Objective: " \
-"This scenario simulates a rogue open access point that broadcasts a known SSID in order to trick client devices into automatically connecting.  This takes advantage of auto-connect behaviour for open networks stored in the client's known networks list."
+"This scenario simulates a Malicious Hotspot. Unlike an Evil Twin (T004), it does not impersonate a specific secure network. Instead, it broadcasts a common or plausible-sounding OPEN network name. The goal is to trick clients that have previously connected to an open network with the same name into auto-connecting, exposing their traffic."
 print_line
 
 confirmation
 
 # ─── Show Requirements ───
 print_section "Requirements"
-print_none "1. Client device must have previously associated with AP: $SCN_SSID"
-print_none "2. Client device must have auto-connect enabled for SSID: $SCN_SSID"
-print_none "3. AP profile: $SCN_PROFILE must be offline"
+print_none "1. A client device must have the open network '$SCN_SSID' in its known networks list."
+print_none "2. The client must have auto-connect enabled for this open network."
 print_blank
 
 # ─── Show Capture Config ───
@@ -59,8 +58,9 @@ if [[ "$START_EXIT_CODE" -ne 0 ]]; then
     exit "$START_EXIT_CODE"
 else
     print_success "Access Point launch successful"
-    print_info "Generating Traffic"
-    sudo timeout "$SCN_DURATION" bash "$HELPERS_DIR/fn_traffic.sh" t015
+    print_info "Waiting for capture duration ($SCN_DURATION seconds)..."
+    # Wait for the configured duration to allow for an external client to connect.
+    sleep "$SCN_DURATION"
     print_blank
 fi
 

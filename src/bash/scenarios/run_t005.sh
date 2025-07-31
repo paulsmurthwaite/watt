@@ -23,17 +23,17 @@ print_none "Tool:          $SCN_TOOL"
 print_none "Mode:          $SCN_MODE"
 print_blank
 print_wrapped_indent "Objective: " \
-"This scenario simluates an attacker deploying an unauthorised, open Wi-Fi access point in a trusted network environment.  The goal is to lure unsuspecitng users to connect, thereby enabled passive traffic observation or active manipulation (e.g. DNS spoofing, phishing pages, or data capture).
+"This script launches an unauthorised, open Wi-Fi access point. The goal is to lure unsuspecting users to connect, enabling traffic observation or further attacks.
 
-Unlike Evil Twin attacks, this rogue AP does not impersonate a known SSID - it presents a new, legitimate-looking network name (e.g. "Guest_WiFi" or "FreePublicWiFi") designed to attract users."
+This script can be used as part of a larger scenario where a legitimate network is taken down, and this rogue AP is brought up to attract disconnected clients."
 print_line
 
 confirmation
 
 # ─── Show Requirements ───
 print_section "Requirements"
-print_none "1. AP Profile: $SCN_PROFILE"
-print_none "2. Client Device must be associated with Rogue AP SSID: $SCN_ROGUE_SSID when launched"
+print_none "1. An external client device is required to connect to the Rogue AP after it is launched."
+print_none "2. The WSTT capture should be running before this script is started."
 print_blank
 
 # ─── Show AP Config ───
@@ -71,8 +71,9 @@ if [[ "$START_EXIT_CODE" -ne 0 ]]; then
     exit "$START_EXIT_CODE"
 else
     print_success "Access Point launch successful"
-    print_info "Generating Traffic"
-    sudo timeout "$SCN_DURATION" bash "$HELPERS_DIR/fn_traffic.sh" t005
+    print_info "Waiting for capture duration ($SCN_DURATION seconds)..."
+    # Wait for the configured duration to allow for external client connection and traffic capture.
+    sleep "$SCN_DURATION"
     print_blank
 fi
 

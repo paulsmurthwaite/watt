@@ -652,6 +652,12 @@ def main():
     """
     User input handler.
     """
+    # WATT launches attack tools that require root privileges.
+    if os.geteuid() != 0:
+        print(colour("[!] WATT must be run with sudo.", "warning"))
+        print("    Please run: sudo python3 watt.py")
+        sys.exit(1)
+
     while True:
         show_menu()
         choice = input(colour("\n[?]  Select an option: ", "success"))

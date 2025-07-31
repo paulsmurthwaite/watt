@@ -60,9 +60,10 @@ confirmation
 clear
 print_section "Simulation"
 
-print_waiting "AP profile $SCN_PROFILE available for: $SCN_DURATION seconds"
+print_info "This script will now wait for the configured duration."
+print_action "Please ensure the misconfigured AP is running and connect a client."
+print_waiting "Simulation running for $SCN_DURATION seconds..."
 sleep "$SCN_DURATION"
-print_action "Stop AP profile $SCN_PROFILE"
 EXIT_CODE=$?
 
 print_blank

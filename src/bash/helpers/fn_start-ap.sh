@@ -34,28 +34,30 @@ source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_services.sh"
 
 # ─── Export for envsubst and BSSID support ───
-export INTERFACE SSID CHANNEL HIDDEN WPA_MODE PASSPHRASE BSSID
+export INTERFACE SSID CHANNEL HIDDEN WPA_MODE PASSPHRASE BSSID BEACON_INT COUNTRY_CODE
 
 # ─── Start AP ───
 print_info "Launching Access Point"
 
-# ─── Unset Optional Parameters (ap_t004) ───
-[[ -z "${BEACON_INT+x}" ]] && unset BEACON_INT
-[[ -z "${COUNTRY_CODE+x}" ]] && unset COUNTRY_CODE
-
 # ─── Generate hostapd.conf ───
+GENERATED_CONF=$(cat "$CONFIG_DIR/hostapd.conf.template")
+
+# Conditionally remove optional parameters if they are not set
 if [[ -z "$WPA_MODE" ]]; then
-    print_action "Skipping WPA"
-    grep -v '^wpa=' "$CONFIG_DIR/hostapd.conf.template" \
-    | grep -v '^wpa_passphrase=' \
-    | grep -v '^wpa_key_mgmt=' \
-    | grep -v '^rsn_pairwise=' \
-    | grep -v '^wpa_pairwise=' \
-    | envsubst > /tmp/hostapd.conf
-else
-    print_action "Applying WPA"
-    envsubst < "$CONFIG_DIR/hostapd.conf.template" > /tmp/hostapd.conf
+    print_action "WPA mode not set, removing WPA parameters from config."
+    GENERATED_CONF=$(echo "$GENERATED_CONF" | grep -v -e '^wpa=' -e '^wpa_passphrase=' -e '^wpa_key_mgmt=' -e '^rsn_pairwise=' -e '^wpa_pairwise=')
 fi
+
+if [[ -z "$BEACON_INT" ]]; then
+    GENERATED_CONF=$(echo "$GENERATED_CONF" | grep -v '^beacon_int=')
+fi
+
+if [[ -z "$COUNTRY_CODE" ]]; then
+    GENERATED_CONF=$(echo "$GENERATED_CONF" | grep -v '^country_code=')
+fi
+
+# Perform substitution on the cleaned-up template
+echo "$GENERATED_CONF" | envsubst > /tmp/hostapd.conf
 
 # ─── NetworkManager ───
 sudo systemctl stop NetworkManager

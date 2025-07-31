@@ -17,26 +17,25 @@ source "$HELPERS_DIR/fn_mode.sh"
 source "$HELPERS_DIR/fn_print.sh"
 source "$HELPERS_DIR/fn_prompt.sh"
 
-# ─── FN: Simulate Directed Probe Requests ───
-simulate_probe_requests() {
-    START_TIME=$(date +%s)
-
-    while true; do
-        CURRENT_TIME=$(date +%s)
-        ELAPSED=$((CURRENT_TIME - START_TIME))
-        if (( ELAPSED >= SCN_DURATION )); then
-            break
-        fi
-
-        # ─── Probes ───
-        for SSID in "${SCN_SSIDS[@]}"; do
-            print_action "Probing for SSID: $SSID"
-            nmcli device wifi connect "$SSID" ifname "$INTERFACE" >/dev/null 2>&1 || true
-            nmcli device disconnect "$INTERFACE" >/dev/null 2>&1
-            sleep "$SCN_INTERVAL"
-        done
-    done
+# --- Cleanup ---
+cleanup() {
+    print_info "Cleaning up..."
+    if [[ -n "$SSID_LIST_FILE" && -f "$SSID_LIST_FILE" ]]; then
+        rm "$SSID_LIST_FILE"
+        print_success "Removed temporary SSID file."
+    fi
+    ensure_managed_mode
+    print_success "Interface restored to managed mode."
 }
+
+# --- Check mdk4 ---
+if ! command -v mdk4 &> /dev/null; then
+    print_fail "mdk4 is not installed. This script requires mdk4 for direct probe request injection."
+    exit 1
+fi
+
+# --- Trap for cleanup on exit ---
+trap cleanup EXIT SIGINT
 
 # ─── Show Scenario ───
 print_none "Threat:        $SCN_NAME"
@@ -75,17 +74,41 @@ confirmation
 clear
 print_section "Simulation"
 
-ensure_managed_mode
-print_waiting "Running"
-simulate_probe_requests
+print_action "Preparing for probe injection..."
 
-EXIT_CODE=$?
+# Create a temporary file with the list of SSIDs
+SSID_LIST_FILE=$(mktemp)
+for SSID in "${SCN_SSIDS[@]}"; do
+    echo "$SSID" >> "$SSID_LIST_FILE"
+done
+print_success "Created temporary SSID list."
+
+print_action "Switching interface to monitor mode for injection..."
+ensure_monitor_mode
+print_success "Interface is in monitor mode."
 print_blank
 
-if (( EXIT_CODE == 0 )); then
-    print_success "Simulation completed"
-else
-    print_fail "Simulation stopped (Code: $EXIT_CODE)"
-fi
+print_info "Running T002 - Probe Request injection for $SCN_DURATION seconds..."
+print_waiting "Injecting directed probe requests for SSIDs in t002.conf"
+
+# Use mdk4's probe request mode 'p' with the SSID file
+# mdk4 exits after one pass of the SSID file. To ensure the attack runs for
+# the full duration, we wrap the mdk4 call in a loop that is then managed
+# by the timeout command. We also redirect the loop's output to /dev/null
+# to keep the screen clean. The `timeout` command can be unreliable with
+# process groups, so we will manage the process lifetime manually.
+
+# Start the injection loop in the background and get its PID
+bash -c "while true; do mdk4 '$INTERFACE' p -f '$SSID_LIST_FILE' -s 100 &>/dev/null; sleep 1; done" &
+INJECTION_PID=$!
+
+# Allow the main script to wait for the specified duration
+sleep "$SCN_DURATION"
+
+# Terminate the background injection loop and wait for it to exit cleanly
+kill "$INJECTION_PID"
+wait "$INJECTION_PID" 2>/dev/null
+
+print_blank
 
 exit 0

