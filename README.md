@@ -1,6 +1,8 @@
 # Wireless Attack Testing Toolkit (WATT)
 This repository contains configuration files, scripts, and tooling for the Wireless Attack Testing Toolkit (WATT) environment.  It supports the Wireless Security Testing Toolkit (WSTT) project by generating realistic, controlled wireless attack scenarios.
 
+## NOTE: This Repo supported a final year university project is now archived and no longer maintained ##
+
 ## Repository Structure
 - attacks/ – Per-threat scenario folders for each implemented attack
 - scripts/ – Core AP launch, teardown, and service control scripts
