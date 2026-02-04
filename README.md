@@ -1,7 +1,7 @@
 # Wireless Attack Testing Toolkit (WATT)
 
 ## Overview
-WATT contains the specialized scripts and configurations required to generate realistic, controlled wireless attack scenarios. It serves as the "Attacker" environment in the research lab setup.
+WATT contains the specialised scripts and configurations required to generate realistic, controlled wireless attack scenarios. It serves as the "Attacker" environment in the research lab setup.
 
 ## Engineering Philosophy
 - **Rigor & Reliability:** Tested against 8 distinct threat classes (passive, active, stateful, and high-volume) with a 100% detection success rate in the associated analysis engine.
